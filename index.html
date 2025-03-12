@@ -870,4 +870,42 @@
             successMessage.style.display = 'none';
         }
 
+// Load default data when page loads
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Try loading default CSV
+        const csvResponse = await fetch('ww1-timeline.csv');
+        if (!csvResponse.ok) throw new Error('Default CSV not found');
+        const csvData = await csvResponse.text();
+        
+        // Parse CSV data
+        parseCSV(csvData);
+        
+        // Try loading default ZIP images
+        try {
+            const zipResponse = await fetch('images.zip');
+            if (zipResponse.ok) {
+                const zipBlob = await zipResponse.blob();
+                await processZipFile(zipBlob);
+            }
+        } catch (zipError) {
+            console.log('No default images found, proceeding without them');
+        }
+        
+        // Render timeline with default data
+        renderTimeline();
+        showSuccess('Default timeline loaded successfully!');
+    } catch (error) {
+        console.error('Error loading default data:', error);
+        showError('Could not load default files. You can upload your own data below.');
+        uploadSection.classList.remove('collapse-section');
+        toggleUploadSection.textContent = 'Hide Upload Section';
+    }
+});
+
+
+	    
+
+	    
+
         // Hide error message
