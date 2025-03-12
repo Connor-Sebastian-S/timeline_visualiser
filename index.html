@@ -761,42 +761,20 @@
         }
 
         // Get color based on event type
-        function getColorForType(type) {
-            // Color mapping for different types
-            const colorMap = {
-                'personal': '#3182ce', // blue
-                'work': '#38a169',     // green
-                'education': '#805ad5', // purple
-                'travel': '#dd6b20',   // orange
-                'health': '#e53e3e',   // red
-                'financial': '#2c7a7b', // teal
-                'family': '#d53f8c',   // pink
-                'social': '#4299e1',   // light blue
-                'project': '#6b46c1',  // indigo
-                'milestone': '#ecc94b', // yellow
-                'political': '#8b5cf6', // purple
-                'military': '#e53e3e', // red
-                'battle': '#c53030',   // dark red
-                'diplomatic': '#2b6cb0', // blue
-                'naval': '#2c5282'     // dark blue
-            };
-            
-            // Normalize type (lowercase and trim)
-            const normalizedType = type.toLowerCase().trim();
-            
-            // Return matching color or generate one based on type string
-            if (colorMap[normalizedType]) {
-                return colorMap[normalizedType];
-            } else {
-                // Generate color based on string hash
-                const hash = normalizedType.split('').reduce((acc, char) => {
-                    return char.charCodeAt(0) + ((acc << 5) - acc);
-                }, 0);
-                
-                const hue = Math.abs(hash) % 360;
-                return `hsl(${hue}, 70%, 40%)`;
-            }
-        }
+        // Get color based on event type with randomized but consistent colours
+	function getColorForType(type) {
+	    // Create a hash from the type string for consistent colours
+	    const hash = type.split('').reduce((acc, char) => {
+	        return char.charCodeAt(0) + ((acc << 5) - acc);
+	    }, 0);
+	    
+	    // Generate HSL colour values for better distribution and readability
+	    const hue = Math.abs(hash) % 360;
+	    const saturation = 70 + (hash % 20); // Between 70-90%
+	    const lightness = 35 + (hash % 15);  // Between 35-50% for sufficient contrast
+	    
+	    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+	}
 
         // Show event details in modal
         function showEventDetails(event) {
