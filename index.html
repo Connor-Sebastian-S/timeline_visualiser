@@ -280,16 +280,38 @@
             border-radius: 4px;
             display: none;
         }
+
+        .toggle-section-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-section-btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .collapse-section {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Interactive Timeline</h1>
-            <p>Upload your CSV data and images to create an interactive timeline visualisation</p>
+            <p>Explore the default timeline or upload your own data</p>
         </header>
 
-        <section class="upload-section">
+        <button id="toggleUploadSection" class="toggle-section-btn">Show Upload Section</button>
+        
+        <section id="uploadSection" class="upload-section collapse-section">
             <div class="instructions">
                 <h3>Instructions:</h3>
                 <p>1. Prepare a CSV file with the following columns: ID, START_DATE (DD-MM-YYYY), END_DATE (DD-MM-YYYY), EVENT, DESCRIPTION, and TYPE (optional).</p>
@@ -380,6 +402,19 @@
         const imageLightbox = document.getElementById('imageLightbox');
         const lightboxImage = document.getElementById('lightboxImage');
         const lightboxClose = document.querySelector('.lightbox-close');
+        const toggleUploadSection = document.getElementById('toggleUploadSection');
+        const uploadSection = document.getElementById('uploadSection');
+
+        // Toggle upload section visibility
+        toggleUploadSection.addEventListener('click', () => {
+            if (uploadSection.classList.contains('collapse-section')) {
+                uploadSection.classList.remove('collapse-section');
+                toggleUploadSection.textContent = 'Hide Upload Section';
+            } else {
+                uploadSection.classList.add('collapse-section');
+                toggleUploadSection.textContent = 'Show Upload Section';
+            }
+        });
 
         // Event listeners for drag and drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -653,128 +688,127 @@
         }
 
         function renderTimeline() {
-    if (!timelineData.length) return;
-    
-    // Clear previous content
-    timelineEvents.innerHTML = '';
-    
-    // Set SVG dimensions
-    const svgWidth = timelineContainer.clientWidth;
-    const bubbleWidth = 120; // Match the CSS width
-    const bubbleHeight = 60; // Match the CSS height
-    const bubbleHalfWidth = bubbleWidth / 2;
-    const bubbleHalfHeight = bubbleHeight / 2;
-    const segmentHeight = 120; // Space between rows
-    const numEvents = timelineData.length;
-    const numRows = Math.ceil(numEvents / 2);
-    const pathHeight = numRows * segmentHeight;
-    
-    // Update SVG height
-    timelineSvg.setAttribute('height', pathHeight + bubbleHeight);
-    
-    // Generate path
-    let pathData = `M ${bubbleHalfWidth} ${bubbleHalfHeight}`;
-    const lineWidth = svgWidth - bubbleWidth;
-    
-    const positions = [];
-    
-    // Calculate positions for each event
-    for (let i = 0; i < numEvents; i++) {
-        const row = Math.floor(i / 2);
-        const isEven = i % 2 === 0;
-        const rowY = bubbleHalfHeight + row * segmentHeight;
-        let posX;
-        
-        if (row % 2 === 0) {
-            // Left to right row
-            const rowProgress = isEven ? 0.25 : 0.75;
-            posX = bubbleHalfWidth + rowProgress * lineWidth;
-        } else {
-            // Right to left row
-            const rowProgress = isEven ? 0.75 : 0.25;
-            posX = bubbleHalfWidth + (1 - rowProgress) * lineWidth;
-        }
-        
-        positions.push({ x: posX, y: rowY });
-    }
-    
-    // Create path that only goes through the positions
-    if (positions.length > 0) {
-        pathData = `M ${positions[0].x} ${positions[0].y}`;
-        
-        for (let i = 1; i < positions.length; i++) {
-            const prev = positions[i-1];
-            const curr = positions[i];
+            if (!timelineData.length) return;
             
-            // If moving to a new row
-            if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
-                // Complete the current row
-                if (Math.floor((i-1) / 2) % 2 === 0) {
-                    // End of left-to-right row
-                    pathData += ` L ${svgWidth - bubbleHalfWidth} ${prev.y}`;
-                    // Go down
-                    pathData += ` L ${svgWidth - bubbleHalfWidth} ${curr.y}`;
-                    // Start right-to-left
-                    pathData += ` L ${curr.x} ${curr.y}`;
+            // Clear previous content
+            timelineEvents.innerHTML = '';
+            
+            // Set SVG dimensions
+            const svgWidth = timelineContainer.clientWidth;
+            const bubbleWidth = 120; // Match the CSS width
+            const bubbleHeight = 60; // Match the CSS height
+            const bubbleHalfWidth = bubbleWidth / 2;
+            const bubbleHalfHeight = bubbleHeight / 2;
+            const segmentHeight = 120; // Space between rows
+            const numEvents = timelineData.length;
+            const numRows = Math.ceil(numEvents / 2);
+            const pathHeight = numRows * segmentHeight;
+            
+            // Update SVG height
+            timelineSvg.setAttribute('height', pathHeight + bubbleHeight);
+            
+            // Generate path
+            let pathData = `M ${bubbleHalfWidth} ${bubbleHalfHeight}`;
+            const lineWidth = svgWidth - bubbleWidth;
+            
+            const positions = [];
+            
+            // Calculate positions for each event
+            for (let i = 0; i < numEvents; i++) {
+                const row = Math.floor(i / 2);
+                const isEven = i % 2 === 0;
+                const rowY = bubbleHalfHeight + row * segmentHeight;
+                let posX;
+                
+                if (row % 2 === 0) {
+                    // Left to right row
+                    const rowProgress = isEven ? 0.25 : 0.75;
+                    posX = bubbleHalfWidth + rowProgress * lineWidth;
                 } else {
-                    // End of right-to-left row
-                    pathData += ` L ${bubbleHalfWidth} ${prev.y}`;
-                    // Go down
-                    pathData += ` L ${bubbleHalfWidth} ${curr.y}`;
-                    // Start left-to-right
-                    pathData += ` L ${curr.x} ${curr.y}`;
+                    // Right to left row
+                    const rowProgress = isEven ? 0.75 : 0.25;
+                    posX = bubbleHalfWidth + (1 - rowProgress) * lineWidth;
                 }
-            } else {
-                // Within same row, just draw to next point
-                pathData += ` L ${curr.x} ${curr.y}`;
+                
+                positions.push({ x: posX, y: rowY });
             }
+            
+            // Create path that only goes through the positions
+            if (positions.length > 0) {
+                pathData = `M ${positions[0].x} ${positions[0].y}`;
+                
+                for (let i = 1; i < positions.length; i++) {
+                    const prev = positions[i-1];
+                    const curr = positions[i];
+                    
+                    // If moving to a new row
+                    if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
+                        // Complete the current row
+                        if (Math.floor((i-1) / 2) % 2 === 0) {
+                            // End of left-to-right row
+                            pathData += ` L ${svgWidth - bubbleHalfWidth} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${svgWidth - bubbleHalfWidth} ${curr.y}`;
+                            // Start right-to-left
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        } else {
+                            // End of right-to-left row
+                            pathData += ` L ${bubbleHalfWidth} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${bubbleHalfWidth} ${curr.y}`;
+                            // Start left-to-right
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        }
+                    } else {
+                        // Within same row, just draw to next point
+                        pathData += ` L ${curr.x} ${curr.y}`;
+                    }
+                }
+            }
+            
+            timelinePath.setAttribute('d', pathData);
+            
+            // Place events along the path
+            timelineData.forEach((event, index) => {
+                const position = positions[index];
+                
+                // Create event rectangle
+                const eventElement = document.createElement('div');
+                eventElement.className = 'timeline-event';
+                eventElement.style.left = `${position.x - bubbleHalfWidth}px`;
+                eventElement.style.top = `${position.y - bubbleHalfHeight}px`;
+                
+                // Set color based on type if available
+                if (event.TYPE) {
+                    eventElement.style.backgroundColor = getColorForType(event.TYPE);
+                }
+                
+                // Add event text
+                eventElement.textContent = event.EVENT;
+                
+                // Add click event
+                eventElement.addEventListener('click', () => {
+                    showEventDetails(event);
+                });
+                
+                timelineEvents.appendChild(eventElement);
+            });
         }
-    }
-    
-    timelinePath.setAttribute('d', pathData);
-    
-    // Place events along the path
-    timelineData.forEach((event, index) => {
-        const position = positions[index];
-        
-        // Create event rectangle
-        const eventElement = document.createElement('div');
-        eventElement.className = 'timeline-event';
-        eventElement.style.left = `${position.x - bubbleHalfWidth}px`;
-        eventElement.style.top = `${position.y - bubbleHalfHeight}px`;
-        
-        // Set color based on type if available
-        if (event.TYPE) {
-            eventElement.style.backgroundColor = getColorForType(event.TYPE);
-        }
-        
-        // Add event text
-        eventElement.textContent = event.EVENT;
-        
-        // Add click event
-        eventElement.addEventListener('click', () => {
-            showEventDetails(event);
-        });
-        
-        timelineEvents.appendChild(eventElement);
-    });
-}
 
-        // Get color based on event type
         // Get color based on event type with randomized but consistent colours
-	function getColorForType(type) {
-	    // Create a hash from the type string for consistent colours
-	    const hash = type.split('').reduce((acc, char) => {
-	        return char.charCodeAt(0) + ((acc << 5) - acc);
-	    }, 0);
-	    
-	    // Generate HSL colour values for better distribution and readability
-	    const hue = Math.abs(hash) % 360;
-	    const saturation = 70 + (hash % 20); // Between 70-90%
-	    const lightness = 35 + (hash % 15);  // Between 35-50% for sufficient contrast
-	    
-	    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	}
+        function getColorForType(type) {
+            // Create a hash from the type string for consistent colours
+            const hash = type.split('').reduce((acc, char) => {
+                return char.charCodeAt(0) + ((acc << 5) - acc);
+            }, 0);
+            
+            // Generate HSL colour values for better distribution and readability
+            const hue = Math.abs(hash) % 360;
+            const saturation = 70 + (hash % 20); // Between 70-90%
+            const lightness = 35 + (hash % 15);  // Between 35-50% for sufficient contrast
+            
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
 
         // Show event details in modal
         function showEventDetails(event) {
@@ -837,24 +871,3 @@
         }
 
         // Hide error message
-        function hideError() {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-        }
-
-        // Show success message
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (timelineData.length) {
-                renderTimeline();
-            }
-        });
-    </script>
-</body>
-</html>
