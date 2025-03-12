@@ -874,7 +874,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Try loading default CSV
-        const csvResponse = await fetch('ww1-timeline.csv');
+        const csvResponse = await fetch('./ww1-timeline.csv');
         if (!csvResponse.ok) throw new Error('Default CSV not found');
         const csvData = await csvResponse.text();
         
@@ -883,7 +883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Try loading default ZIP images
         try {
-            const zipResponse = await fetch('images.zip');
+            const zipResponse = await fetch('./images.zip');
             if (zipResponse.ok) {
                 const zipBlob = await zipResponse.blob();
                 await processZipFile(zipBlob);
