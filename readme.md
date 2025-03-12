@@ -2,7 +2,7 @@
 
 A sophisticated web-based tool that enables users to create visually appealing, interactive timelines from structured CSV data with optional image support.
 
-![Interactive Timeline Visualiser](https://placeholder-image.com/timeline-screenshot.png)
+https://connor-sebastian-s.github.io/timeline_visualiser/
 
 ## Overview
 
