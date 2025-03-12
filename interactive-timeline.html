@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Visualiser</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #334e68;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --light-gray: #e1e5eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .upload-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-container {
+            border: 2px dashed var(--light-gray);
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .upload-container.dragover {
+            background-color: rgba(74, 111, 165, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .upload-container p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .images-upload-container {
+            margin-top: 20px;
+        }
+
+        .timeline-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-container {
+            position: relative;
+            margin: 40px 0;
+            min-height: 500px;
+        }
+
+        .timeline-path {
+            position: absolute;
+            stroke: var(--primary-color);
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .timeline-event {
+            position: absolute;
+            width: 80px; /* Increased from 60px */
+            height: 80px; /* Increased from 60px */
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 10;
+            font-size: 14px; /* Increased from 12px */
+            text-align: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .timeline-event:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            width: 70%;
+            max-width: 800px;
+            border-radius: 8px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .event-title {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--light-gray);
+            padding-bottom: 10px;
+        }
+
+        .event-info {
+            margin-bottom: 20px;
+        }
+
+        .event-description {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .event-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .event-images img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .event-images img:hover {
+            transform: scale(1.05);
+        }
+
+        .lightbox {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.9);
+			z-index: 200;
+			align-items: center;
+			justify-content: center;
+		}
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        .instructions {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e53e3e;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff5f5;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success-message {
+            color: #38a169;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0fff4;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Interactive Timeline Visualizer</h1>
+            <p>Upload your CSV data and images to create an interactive timeline visualization</p>
+        </header>
+
+        <section class="upload-section">
+            <div class="instructions">
+                <h3>Instructions:</h3>
+                <p>1. Prepare a CSV file with the following columns: ID, START_DATE (DD-MM-YYYY), END_DATE (DD-MM-YYYY), EVENT, DESCRIPTION, and TYPE (optional).</p>
+                <p>2. Optionally, prepare images in folders named after the ID of each event.</p>
+                <p>3. Upload your CSV file by dropping it below or clicking "Select CSV File".</p>
+                <p>4. If you have images, zip them into a file and upload it.</p>
+            </div>
+
+            <div id="csvDropArea" class="upload-container">
+                <p>Drag and drop your CSV file here or</p>
+                <input type="file" id="csvFileInput" class="file-input" accept=".csv">
+                <button class="upload-btn" onclick="document.getElementById('csvFileInput').click()">Select CSV File</button>
+                <div id="csvFileName" style="margin-top: 15px;"></div>
+            </div>
+
+            <div id="imagesDropArea" class="upload-container images-upload-container">
+                <p>Drag and drop your ZIP file with images here or</p>
+                <input type="file" id="imagesFileInput" class="file-input" accept=".zip">
+                <button class="upload-btn" onclick="document.getElementById('imagesFileInput').click()">Select ZIP File (Optional)</button>
+                <div id="imagesFileName" style="margin-top: 15px;"></div>
+            </div>
+
+            <button id="processBtn" class="upload-btn" style="width: 100%; margin-top: 20px;">Process Data</button>
+            
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>Processing your data...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+        </section>
+
+        <section class="timeline-section">
+            <h2>Timeline Visualization</h2>
+            <div id="timelineContainer" class="timeline-container">
+                <svg id="timelineSvg" width="100%" height="100%">
+                    <path id="timelinePath" class="timeline-path"></path>
+                </svg>
+                <div id="timelineEvents"></div>
+            </div>
+        </section>
+
+        <div id="eventModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="eventTitle" class="event-title"></h2>
+                <div id="eventInfo" class="event-info"></div>
+                <div id="eventDescription" class="event-description"></div>
+                <div id="eventImages" class="event-images"></div>
+            </div>
+        </div>
+
+        <div id="imageLightbox" class="lightbox">
+            <span class="lightbox-close">&times;</span>
+            <img id="lightboxImage" src="" alt="Enlarged image">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // Global variables to store data
+        let timelineData = [];
+        let imageFiles = {};
+
+        // DOM elements
+        const csvDropArea = document.getElementById('csvDropArea');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const csvFileName = document.getElementById('csvFileName');
+        const imagesDropArea = document.getElementById('imagesDropArea');
+        const imagesFileInput = document.getElementById('imagesFileInput');
+        const imagesFileName = document.getElementById('imagesFileName');
+        const processBtn = document.getElementById('processBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const timelineSvg = document.getElementById('timelineSvg');
+        const timelinePath = document.getElementById('timelinePath');
+        const timelineEvents = document.getElementById('timelineEvents');
+        const eventModal = document.getElementById('eventModal');
+        const closeBtn = document.querySelector('.close-btn');
+        const eventTitle = document.getElementById('eventTitle');
+        const eventInfo = document.getElementById('eventInfo');
+        const eventDescription = document.getElementById('eventDescription');
+        const eventImages = document.getElementById('eventImages');
+        const imageLightbox = document.getElementById('imageLightbox');
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxClose = document.querySelector('.lightbox-close');
+
+        // Event listeners for drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            csvDropArea.addEventListener(eventName, preventDefaults, false);
+            imagesDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            csvDropArea.addEventListener(eventName, () => {
+                csvDropArea.classList.add('dragover');
+            }, false);
+            
+            imagesDropArea.addEventListener(eventName, () => {
+                imagesDropArea.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            csvDropArea.addEventListener(eventName, () => {
+                csvDropArea.classList.remove('dragover');
+            }, false);
+            
+            imagesDropArea.addEventListener(eventName, () => {
+                imagesDropArea.classList.remove('dragover');
+            }, false);
+        });
+
+        // Handle file drop
+        csvDropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                csvFileInput.files = files;
+                handleCSVFile(files[0]);
+            }
+        }, false);
+
+        imagesDropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                imagesFileInput.files = files;
+                handleImageFiles(files[0]);
+            }
+        }, false);
+
+        // Handle file input change
+        csvFileInput.addEventListener('change', () => {
+            if (csvFileInput.files.length) {
+                handleCSVFile(csvFileInput.files[0]);
+            }
+        });
+
+        imagesFileInput.addEventListener('change', () => {
+            if (imagesFileInput.files.length) {
+                handleImageFiles(imagesFileInput.files[0]);
+            }
+        });
+
+        // Process CSV file
+        function handleCSVFile(file) {
+            if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+                showError('Please upload a valid CSV file.');
+                return;
+            }
+
+            csvFileName.textContent = file.name;
+            hideError();
+        }
+
+        // Process ZIP file with images
+        function handleImageFiles(file) {
+            if (file.type !== 'application/zip' && !file.name.endsWith('.zip')) {
+                showError('Please upload a valid ZIP file for images.');
+                return;
+            }
+
+            imagesFileName.textContent = file.name;
+            hideError();
+        }
+
+        // Process button click
+        processBtn.addEventListener('click', () => {
+            if (!csvFileInput.files.length) {
+                showError('Please upload a CSV file.');
+                return;
+            }
+
+            loadingIndicator.style.display = 'block';
+            hideError();
+            
+            const csvFile = csvFileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                try {
+                    const csvData = e.target.result;
+                    parseCSV(csvData);
+                    
+                    if (imagesFileInput.files.length) {
+                        await processZipFile(imagesFileInput.files[0]);
+                    }
+                    
+                    renderTimeline();
+                    showSuccess('Data processed successfully!');
+                } catch (error) {
+                    showError('Error processing data: ' + error.message);
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            };
+            
+            reader.onerror = function() {
+                showError('Error reading the CSV file.');
+                loadingIndicator.style.display = 'none';
+            };
+            
+            reader.readAsText(csvFile);
+        });
+
+        // Parse CSV data
+        function parseCSV(csvData) {
+            const lines = csvData.split('\n');
+            if (lines.length < 2) {
+                throw new Error('CSV file must have at least a header row and one data row.');
+            }
+            
+            const header = lines[0].split(',').map(col => col.trim());
+            const requiredColumns = ['ID', 'START_DATE', 'END_DATE', 'EVENT', 'DESCRIPTION'];
+            
+            // Check if required columns exist
+            for (const col of requiredColumns) {
+                if (!header.includes(col)) {
+                    throw new Error(`Required column "${col}" is missing in the CSV file.`);
+                }
+            }
+            
+            // Parse data rows
+            timelineData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // Handle quoted fields (which may contain commas)
+                const fields = [];
+                let inQuotes = false;
+                let field = '';
+                
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        fields.push(field);
+                        field = '';
+                    } else {
+                        field += char;
+                    }
+                }
+                fields.push(field); // Add the last field
+                
+                // Create event object
+                const event = {};
+                header.forEach((col, index) => {
+                    event[col] = fields[index] ? fields[index].trim() : '';
+                });
+                
+                // Validate date format (DD-MM-YYYY)
+                if (!isValidDateFormat(event.START_DATE) || !isValidDateFormat(event.END_DATE)) {
+                    throw new Error(`Invalid date format in row ${i+1}. Expected DD-MM-YYYY.`);
+                }
+                
+                timelineData.push(event);
+            }
+            
+            // Sort by start date
+            timelineData.sort((a, b) => {
+                return parseDate(a.START_DATE) - parseDate(b.START_DATE);
+            });
+        }
+
+        // Process ZIP file with images
+        async function processZipFile(zipFile) {
+            const zipData = await JSZip.loadAsync(zipFile);
+            imageFiles = {};
+            
+            // Process each file in the ZIP
+            const promises = [];
+            
+            zipData.forEach((relativePath, zipEntry) => {
+                if (zipEntry.dir) return;
+                
+                // Extract ID from the path (assuming folders are named with event IDs)
+                const pathParts = relativePath.split('/');
+                if (pathParts.length < 2) return;
+                
+                const eventId = pathParts[0];
+                
+                // Skip if file is not an image
+                const fileName = pathParts[pathParts.length - 1].toLowerCase();
+                if (!isImageFile(fileName)) return;
+                
+                // Convert to data URL
+                const promise = zipEntry.async('blob').then(blob => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            if (!imageFiles[eventId]) {
+                                imageFiles[eventId] = [];
+                            }
+                            imageFiles[eventId].push(reader.result);
+                            resolve();
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                });
+                
+                promises.push(promise);
+            });
+            
+            await Promise.all(promises);
+        }
+
+        // Validate date format (DD-MM-YYYY)
+        function isValidDateFormat(dateStr) {
+            if (!dateStr) return false;
+            const pattern = /^\d{2}-\d{2}-\d{4}$/;
+            if (!pattern.test(dateStr)) return false;
+            
+            const parts = dateStr.split('-');
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const year = parseInt(parts[2], 10);
+            
+            if (month < 1 || month > 12) return false;
+            
+            const daysInMonth = new Date(year, month, 0).getDate();
+            if (day < 1 || day > daysInMonth) return false;
+            
+            return true;
+        }
+
+        // Convert date string to Date object
+        function parseDate(dateStr) {
+            const parts = dateStr.split('-');
+            return new Date(
+                parseInt(parts[2]), // year
+                parseInt(parts[1]) - 1, // month (0-based)
+                parseInt(parts[0]) // day
+            );
+        }
+
+        // Format date for display
+        function formatDate(dateStr) {
+            const parts = dateStr.split('-');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${parts[0]} ${months[parseInt(parts[1]) - 1]} ${parts[2]}`;
+        }
+
+        // Check if file is an image
+        function isImageFile(fileName) {
+            const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'];
+            return extensions.some(ext => fileName.endsWith(ext));
+        }
+
+        // Render the timeline
+        function renderTimeline() {
+            if (!timelineData.length) return;
+            
+            // Clear previous content
+            timelineEvents.innerHTML = '';
+            
+            // Set SVG dimensions
+            const svgWidth = timelineContainer.clientWidth;
+            const bubbleSize = 80; // Match the CSS width/height
+            const bubbleRadius = bubbleSize / 2;
+            const segmentHeight = 120; // Increased to accommodate larger bubbles
+            const numEvents = timelineData.length;
+            const numRows = Math.ceil(numEvents / 2);
+            const pathHeight = numRows * segmentHeight;
+            
+            // Update SVG height
+            timelineSvg.setAttribute('height', pathHeight + bubbleSize);
+            
+            // Generate squiggle path
+            let pathData = `M ${bubbleRadius} ${bubbleRadius}`;
+            let x = bubbleRadius;
+            let y = bubbleRadius;
+            const lineWidth = svgWidth - bubbleSize;
+            
+            const positions = [];
+            
+            // Calculate positions for each event
+            for (let i = 0; i < numEvents; i++) {
+                const row = Math.floor(i / 2);
+                const isEven = i % 2 === 0;
+                const rowY = bubbleRadius + row * segmentHeight;
+                let posX;
+                
+                if (row % 2 === 0) {
+                    // Left to right row
+                    const rowProgress = isEven ? 0.25 : 0.75;
+                    posX = bubbleRadius + rowProgress * lineWidth;
+                } else {
+                    // Right to left row
+                    const rowProgress = isEven ? 0.75 : 0.25;
+                    posX = bubbleRadius + (1 - rowProgress) * lineWidth;
+                }
+                
+                positions.push({ x: posX, y: rowY });
+            }
+            
+            // Create path that only goes through the positions
+            if (positions.length > 0) {
+                pathData = `M ${positions[0].x} ${positions[0].y}`;
+                
+                for (let i = 1; i < positions.length; i++) {
+                    const prev = positions[i-1];
+                    const curr = positions[i];
+                    
+                    // If moving to a new row
+                    if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
+                        // Complete the current row
+                        if (Math.floor((i-1) / 2) % 2 === 0) {
+                            // End of left-to-right row
+                            pathData += ` L ${svgWidth - bubbleRadius} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${svgWidth - bubbleRadius} ${curr.y}`;
+                            // Start right-to-left
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        } else {
+                            // End of right-to-left row
+                            pathData += ` L ${bubbleRadius} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${bubbleRadius} ${curr.y}`;
+                            // Start left-to-right
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        }
+                    } else {
+                        // Within same row, just draw to next point
+                        pathData += ` L ${curr.x} ${curr.y}`;
+                    }
+                }
+            }
+            
+            timelinePath.setAttribute('d', pathData);
+            
+            // Place events along the path
+            timelineData.forEach((event, index) => {
+                const position = positions[index];
+                
+                // Create event bubble
+                const eventBubble = document.createElement('div');
+                eventBubble.className = 'timeline-event';
+                eventBubble.style.left = `${position.x - bubbleRadius}px`;
+                eventBubble.style.top = `${position.y - bubbleRadius}px`;
+                
+                // Set color based on type if available
+                if (event.TYPE) {
+                    eventBubble.style.backgroundColor = getColorForType(event.TYPE);
+                }
+                
+                // Add event text
+                eventBubble.textContent = event.EVENT;
+                
+                // Add click event
+                eventBubble.addEventListener('click', () => {
+                    showEventDetails(event);
+                });
+                
+                timelineEvents.appendChild(eventBubble);
+            });
+        }
+
+        // Get color based on event type
+        function getColorForType(type) {
+            // Color mapping for different types
+            const colorMap = {
+                'personal': '#3182ce', // blue
+                'work': '#38a169',     // green
+                'education': '#805ad5', // purple
+                'travel': '#dd6b20',   // orange
+                'health': '#e53e3e',   // red
+                'financial': '#2c7a7b', // teal
+                'family': '#d53f8c',   // pink
+                'social': '#4299e1',   // light blue
+                'project': '#6b46c1',  // indigo
+                'milestone': '#ecc94b', // yellow
+                'political': '#8b5cf6', // purple
+                'military': '#e53e3e', // red
+                'battle': '#c53030',   // dark red
+                'diplomatic': '#2b6cb0', // blue
+                'naval': '#2c5282'     // dark blue
+            };
+            
+            // Normalize type (lowercase and trim)
+            const normalizedType = type.toLowerCase().trim();
+            
+            // Return matching color or generate one based on type string
+            if (colorMap[normalizedType]) {
+                return colorMap[normalizedType];
+            } else {
+                // Generate color based on string hash
+                const hash = normalizedType.split('').reduce((acc, char) => {
+                    return char.charCodeAt(0) + ((acc << 5) - acc);
+                }, 0);
+                
+                const hue = Math.abs(hash) % 360;
+                return `hsl(${hue}, 70%, 40%)`;
+            }
+        }
+
+        // Show event details in modal
+        function showEventDetails(event) {
+            eventTitle.textContent = `${formatDate(event.START_DATE)} - ${formatDate(event.END_DATE)}`;
+            eventInfo.textContent = event.EVENT;
+            eventDescription.textContent = event.DESCRIPTION;
+            
+            // Clear previous images
+            eventImages.innerHTML = '';
+            
+            // Add images if available
+            if (imageFiles[event.ID] && imageFiles[event.ID].length) {
+                imageFiles[event.ID].forEach(imgSrc => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = event.EVENT;
+                    img.addEventListener('click', () => {
+                        showImageInLightbox(imgSrc);
+                    });
+                    eventImages.appendChild(img);
+                });
+            } else {
+                eventImages.innerHTML = '<p>No images available for this event.</p>';
+            }
+            
+            eventModal.style.display = 'block';
+        }
+
+        // Show image in lightbox
+        function showImageInLightbox(imgSrc) {
+            lightboxImage.src = imgSrc;
+            imageLightbox.style.display = 'flex';
+        }
+
+        // Close modal
+        closeBtn.addEventListener('click', () => {
+            eventModal.style.display = 'none';
+        });
+
+        // Close lightbox
+        lightboxClose.addEventListener('click', () => {
+            imageLightbox.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === eventModal) {
+                eventModal.style.display = 'none';
+            }
+            if (e.target === imageLightbox) {
+                imageLightbox.style.display = 'none';
+            }
+        });
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        // Hide error message
+        function hideError() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (timelineData.length) {
+                renderTimeline();
+            }
+        });
+    </script>
+</body>
+</html>
