@@ -113,24 +113,24 @@
         }
 
         .timeline-event {
-            position: absolute;
-            width: 80px; /* Increased from 60px */
-            height: 80px; /* Increased from 60px */
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            z-index: 10;
-            font-size: 14px; /* Increased from 12px */
-            text-align: center;
-            padding: 10px;
-            overflow: hidden;
-        }
+	    position: absolute;
+	    width: 120px; /* Wider than the original 80px */
+	    height: 60px; /* Shorter than the original 80px for a rectangular shape */
+	    border-radius: 4px; /* Small rounded corners instead of 50% */
+	    background-color: var(--primary-color);
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    color: white;
+	    font-weight: bold;
+	    cursor: pointer;
+	    transition: transform 0.3s, box-shadow 0.3s;
+	    z-index: 10;
+	    font-size: 14px;
+	    text-align: center;
+	    padding: 10px;
+	    overflow: hidden;
+	}
 
         .timeline-event:hover {
             transform: scale(1.1);
@@ -651,114 +651,113 @@
             return extensions.some(ext => fileName.endsWith(ext));
         }
 
-        // Render the timeline
         function renderTimeline() {
-            if (!timelineData.length) return;
-            
-            // Clear previous content
-            timelineEvents.innerHTML = '';
-            
-            // Set SVG dimensions
-            const svgWidth = timelineContainer.clientWidth;
-            const bubbleSize = 80; // Match the CSS width/height
-            const bubbleRadius = bubbleSize / 2;
-            const segmentHeight = 120; // Increased to accommodate larger bubbles
-            const numEvents = timelineData.length;
-            const numRows = Math.ceil(numEvents / 2);
-            const pathHeight = numRows * segmentHeight;
-            
-            // Update SVG height
-            timelineSvg.setAttribute('height', pathHeight + bubbleSize);
-            
-            // Generate squiggle path
-            let pathData = `M ${bubbleRadius} ${bubbleRadius}`;
-            let x = bubbleRadius;
-            let y = bubbleRadius;
-            const lineWidth = svgWidth - bubbleSize;
-            
-            const positions = [];
-            
-            // Calculate positions for each event
-            for (let i = 0; i < numEvents; i++) {
-                const row = Math.floor(i / 2);
-                const isEven = i % 2 === 0;
-                const rowY = bubbleRadius + row * segmentHeight;
-                let posX;
-                
-                if (row % 2 === 0) {
-                    // Left to right row
-                    const rowProgress = isEven ? 0.25 : 0.75;
-                    posX = bubbleRadius + rowProgress * lineWidth;
-                } else {
-                    // Right to left row
-                    const rowProgress = isEven ? 0.75 : 0.25;
-                    posX = bubbleRadius + (1 - rowProgress) * lineWidth;
-                }
-                
-                positions.push({ x: posX, y: rowY });
-            }
-            
-            // Create path that only goes through the positions
-            if (positions.length > 0) {
-                pathData = `M ${positions[0].x} ${positions[0].y}`;
-                
-                for (let i = 1; i < positions.length; i++) {
-                    const prev = positions[i-1];
-                    const curr = positions[i];
-                    
-                    // If moving to a new row
-                    if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
-                        // Complete the current row
-                        if (Math.floor((i-1) / 2) % 2 === 0) {
-                            // End of left-to-right row
-                            pathData += ` L ${svgWidth - bubbleRadius} ${prev.y}`;
-                            // Go down
-                            pathData += ` L ${svgWidth - bubbleRadius} ${curr.y}`;
-                            // Start right-to-left
-                            pathData += ` L ${curr.x} ${curr.y}`;
-                        } else {
-                            // End of right-to-left row
-                            pathData += ` L ${bubbleRadius} ${prev.y}`;
-                            // Go down
-                            pathData += ` L ${bubbleRadius} ${curr.y}`;
-                            // Start left-to-right
-                            pathData += ` L ${curr.x} ${curr.y}`;
-                        }
-                    } else {
-                        // Within same row, just draw to next point
-                        pathData += ` L ${curr.x} ${curr.y}`;
-                    }
-                }
-            }
-            
-            timelinePath.setAttribute('d', pathData);
-            
-            // Place events along the path
-            timelineData.forEach((event, index) => {
-                const position = positions[index];
-                
-                // Create event bubble
-                const eventBubble = document.createElement('div');
-                eventBubble.className = 'timeline-event';
-                eventBubble.style.left = `${position.x - bubbleRadius}px`;
-                eventBubble.style.top = `${position.y - bubbleRadius}px`;
-                
-                // Set color based on type if available
-                if (event.TYPE) {
-                    eventBubble.style.backgroundColor = getColorForType(event.TYPE);
-                }
-                
-                // Add event text
-                eventBubble.textContent = event.EVENT;
-                
-                // Add click event
-                eventBubble.addEventListener('click', () => {
-                    showEventDetails(event);
-                });
-                
-                timelineEvents.appendChild(eventBubble);
-            });
+    if (!timelineData.length) return;
+    
+    // Clear previous content
+    timelineEvents.innerHTML = '';
+    
+    // Set SVG dimensions
+    const svgWidth = timelineContainer.clientWidth;
+    const bubbleWidth = 120; // Match the CSS width
+    const bubbleHeight = 60; // Match the CSS height
+    const bubbleHalfWidth = bubbleWidth / 2;
+    const bubbleHalfHeight = bubbleHeight / 2;
+    const segmentHeight = 120; // Space between rows
+    const numEvents = timelineData.length;
+    const numRows = Math.ceil(numEvents / 2);
+    const pathHeight = numRows * segmentHeight;
+    
+    // Update SVG height
+    timelineSvg.setAttribute('height', pathHeight + bubbleHeight);
+    
+    // Generate path
+    let pathData = `M ${bubbleHalfWidth} ${bubbleHalfHeight}`;
+    const lineWidth = svgWidth - bubbleWidth;
+    
+    const positions = [];
+    
+    // Calculate positions for each event
+    for (let i = 0; i < numEvents; i++) {
+        const row = Math.floor(i / 2);
+        const isEven = i % 2 === 0;
+        const rowY = bubbleHalfHeight + row * segmentHeight;
+        let posX;
+        
+        if (row % 2 === 0) {
+            // Left to right row
+            const rowProgress = isEven ? 0.25 : 0.75;
+            posX = bubbleHalfWidth + rowProgress * lineWidth;
+        } else {
+            // Right to left row
+            const rowProgress = isEven ? 0.75 : 0.25;
+            posX = bubbleHalfWidth + (1 - rowProgress) * lineWidth;
         }
+        
+        positions.push({ x: posX, y: rowY });
+    }
+    
+    // Create path that only goes through the positions
+    if (positions.length > 0) {
+        pathData = `M ${positions[0].x} ${positions[0].y}`;
+        
+        for (let i = 1; i < positions.length; i++) {
+            const prev = positions[i-1];
+            const curr = positions[i];
+            
+            // If moving to a new row
+            if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
+                // Complete the current row
+                if (Math.floor((i-1) / 2) % 2 === 0) {
+                    // End of left-to-right row
+                    pathData += ` L ${svgWidth - bubbleHalfWidth} ${prev.y}`;
+                    // Go down
+                    pathData += ` L ${svgWidth - bubbleHalfWidth} ${curr.y}`;
+                    // Start right-to-left
+                    pathData += ` L ${curr.x} ${curr.y}`;
+                } else {
+                    // End of right-to-left row
+                    pathData += ` L ${bubbleHalfWidth} ${prev.y}`;
+                    // Go down
+                    pathData += ` L ${bubbleHalfWidth} ${curr.y}`;
+                    // Start left-to-right
+                    pathData += ` L ${curr.x} ${curr.y}`;
+                }
+            } else {
+                // Within same row, just draw to next point
+                pathData += ` L ${curr.x} ${curr.y}`;
+            }
+        }
+    }
+    
+    timelinePath.setAttribute('d', pathData);
+    
+    // Place events along the path
+    timelineData.forEach((event, index) => {
+        const position = positions[index];
+        
+        // Create event rectangle
+        const eventElement = document.createElement('div');
+        eventElement.className = 'timeline-event';
+        eventElement.style.left = `${position.x - bubbleHalfWidth}px`;
+        eventElement.style.top = `${position.y - bubbleHalfHeight}px`;
+        
+        // Set color based on type if available
+        if (event.TYPE) {
+            eventElement.style.backgroundColor = getColorForType(event.TYPE);
+        }
+        
+        // Add event text
+        eventElement.textContent = event.EVENT;
+        
+        // Add click event
+        eventElement.addEventListener('click', () => {
+            showEventDetails(event);
+        });
+        
+        timelineEvents.appendChild(eventElement);
+    });
+}
 
         // Get color based on event type
         // Get color based on event type with randomized but consistent colours
