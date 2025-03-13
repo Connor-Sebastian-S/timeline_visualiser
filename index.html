@@ -39,17 +39,17 @@
 
         h1 {
             color: var(--secondary-color);
-            margin-bottom: 10px;
+            margin-botstom: 10px;
         }
 
         .upload-section {
-	    display: block; /* Add this line */
-	    background-color: white;
-	    border-radius: 8px;
-	    padding: 20px;
-	    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-	    margin-bottom: 30px;
-	}
+			display: block; /* Add this line */
+			background-color: white;
+			border-radius: 8px;
+			padding: 20px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			margin-bottom: 30px;
+		}
 
 
         .upload-container {
@@ -115,29 +115,38 @@
         }
 
         .timeline-event {
-	    position: absolute;
-	    width: 120px; /* Wider than the original 80px */
-	    height: 60px; /* Shorter than the original 80px for a rectangular shape */
-	    border-radius: 4px; /* Small rounded corners instead of 50% */
-	    background-color: var(--primary-color);
-	    display: flex;
-	    align-items: center;
-	    justify-content: center;
-	    color: white;
-	    font-weight: bold;
-	    cursor: pointer;
-	    transition: transform 0.3s, box-shadow 0.3s;
-	    z-index: 10;
-	    font-size: 14px;
-	    text-align: center;
-	    padding: 10px;
-	    overflow: hidden;
-	}
+			position: absolute;
+			width: 120px; /* Wider than the original 80px */
+			height: 80px; /* Shorter than the original 80px for a rectangular shape */
+			border-radius: 4px; /* Small rounded corners instead of 50% */
+			background-color: var(--primary-color);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-weight: bold;
+			cursor: pointer;
+			transition: transform 0.3s, box-shadow 0.3s;
+			z-index: 10;
+			font-size: 12px;
+			text-align: center;
+			padding: 10px;
+			overflow: hidden;
+		}
 
         .timeline-event:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+		
+		.timeline-event {
+			z-index: 20; /* Ensure boxes stay above timeline path */
+		}
+
+		.timeline-path {
+			z-index: 10; /* Keep path below boxes */
+		}
+
 
         .modal {
             display: none;
@@ -302,6 +311,62 @@
         .collapse-section {
             display: none;
         }
+		
+		.timeline-path-segment {
+			stroke-width: 3;
+			fill: none;
+			transition: stroke 0.3s;
+		}
+		
+		.timeline-legend {
+			background: white;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.legend-items {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 10px;
+		}
+
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			padding: 5px 10px;
+			border-radius: 4px;
+			background: var(--background-color);
+			cursor: pointer;
+			transition: transform 0.2s;
+		}
+
+		.legend-item:hover {
+			transform: translateY(-2px);
+		}
+
+		.color-swatch {
+			width: 20px;
+			height: 20px;
+			border-radius: 3px;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+		}
+
+		.legend-group {
+			flex: 1;
+			min-width: 250px;
+			margin: 10px;
+		}
+
+		.timeline-legend {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+		}
+
     </style>
 </head>
 <body>
@@ -349,6 +414,16 @@
 
         <section class="timeline-section">
             <h2>Timeline Visualisation</h2>
+			<div class="timeline-legend">
+				<div class="legend-group">
+					<h3>Year Colors</h3>
+					<div id="yearLegend" class="legend-items"></div>
+				</div>
+				<div class="legend-group">
+					<h3>Event Type Colors</h3>
+					<div id="typeLegend" class="legend-items"></div>
+				</div>
+			</div>
             <div id="timelineContainer" class="timeline-container">
                 <svg id="timelineSvg" width="100%" height="100%">
                     <path id="timelinePath" class="timeline-path"></path>
@@ -361,7 +436,7 @@
             <div class="modal-content">
                 <span class="close-btn">&times;</span>
                 <h2 id="eventTitle" class="event-title"></h2>
-                <div id="eventInfo" class="event-info"></div>
+                <h3 id="eventInfo" class="event-info"></h3>
                 <div id="eventDescription" class="event-description"></div>
                 <div id="eventImages" class="event-images"></div>
             </div>
@@ -690,127 +765,213 @@
         }
 
         function renderTimeline() {
-            if (!timelineData.length) return;
-            
-            // Clear previous content
-            timelineEvents.innerHTML = '';
-            
-            // Set SVG dimensions
-            const svgWidth = timelineContainer.clientWidth;
-            const bubbleWidth = 120; // Match the CSS width
-            const bubbleHeight = 60; // Match the CSS height
-            const bubbleHalfWidth = bubbleWidth / 2;
-            const bubbleHalfHeight = bubbleHeight / 2;
-            const segmentHeight = 120; // Space between rows
-            const numEvents = timelineData.length;
-            const numRows = Math.ceil(numEvents / 2);
-            const pathHeight = numRows * segmentHeight;
-            
-            // Update SVG height
-            timelineSvg.setAttribute('height', pathHeight + bubbleHeight);
-            
-            // Generate path
-            let pathData = `M ${bubbleHalfWidth} ${bubbleHalfHeight}`;
-            const lineWidth = svgWidth - bubbleWidth;
-            
-            const positions = [];
-            
-            // Calculate positions for each event
-            for (let i = 0; i < numEvents; i++) {
-                const row = Math.floor(i / 2);
-                const isEven = i % 2 === 0;
-                const rowY = bubbleHalfHeight + row * segmentHeight;
-                let posX;
-                
-                if (row % 2 === 0) {
-                    // Left to right row
-                    const rowProgress = isEven ? 0.25 : 0.75;
-                    posX = bubbleHalfWidth + rowProgress * lineWidth;
-                } else {
-                    // Right to left row
-                    const rowProgress = isEven ? 0.75 : 0.25;
-                    posX = bubbleHalfWidth + (1 - rowProgress) * lineWidth;
-                }
-                
-                positions.push({ x: posX, y: rowY });
-            }
-            
-            // Create path that only goes through the positions
-            if (positions.length > 0) {
-                pathData = `M ${positions[0].x} ${positions[0].y}`;
-                
-                for (let i = 1; i < positions.length; i++) {
-                    const prev = positions[i-1];
-                    const curr = positions[i];
-                    
-                    // If moving to a new row
-                    if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
-                        // Complete the current row
-                        if (Math.floor((i-1) / 2) % 2 === 0) {
-                            // End of left-to-right row
-                            pathData += ` L ${svgWidth - bubbleHalfWidth} ${prev.y}`;
-                            // Go down
-                            pathData += ` L ${svgWidth - bubbleHalfWidth} ${curr.y}`;
-                            // Start right-to-left
-                            pathData += ` L ${curr.x} ${curr.y}`;
-                        } else {
-                            // End of right-to-left row
-                            pathData += ` L ${bubbleHalfWidth} ${prev.y}`;
-                            // Go down
-                            pathData += ` L ${bubbleHalfWidth} ${curr.y}`;
-                            // Start left-to-right
-                            pathData += ` L ${curr.x} ${curr.y}`;
-                        }
-                    } else {
-                        // Within same row, just draw to next point
-                        pathData += ` L ${curr.x} ${curr.y}`;
-                    }
-                }
-            }
-            
-            timelinePath.setAttribute('d', pathData);
-            
-            // Place events along the path
-            timelineData.forEach((event, index) => {
-                const position = positions[index];
-                
-                // Create event rectangle
-                const eventElement = document.createElement('div');
-                eventElement.className = 'timeline-event';
-                eventElement.style.left = `${position.x - bubbleHalfWidth}px`;
-                eventElement.style.top = `${position.y - bubbleHalfHeight}px`;
-                
-                // Set color based on type if available
-                if (event.TYPE) {
-                    eventElement.style.backgroundColor = getColorForType(event.TYPE);
-                }
-                
-                // Add event text
-                eventElement.textContent = event.EVENT;
-                
-                // Add click event
-                eventElement.addEventListener('click', () => {
-                    showEventDetails(event);
-                });
-                
-                timelineEvents.appendChild(eventElement);
-            });
-        }
+			if (!timelineData.length) return;
 
-        // Get color based on event type with randomized but consistent colours
-        function getColorForType(type) {
-            // Create a hash from the type string for consistent colours
-            const hash = type.split('').reduce((acc, char) => {
-                return char.charCodeAt(0) + ((acc << 5) - acc);
-            }, 0);
-            
-            // Generate HSL colour values for better distribution and readability
-            const hue = Math.abs(hash) % 360;
-            const saturation = 70 + (hash % 20); // Between 70-90%
-            const lightness = 35 + (hash % 15);  // Between 35-50% for sufficient contrast
-            
-            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-        }
+			// Clear previous content
+			timelineEvents.innerHTML = '';
+			
+			// Setup dimensions
+			const svgWidth = timelineContainer.clientWidth;
+			const bubbleWidth = 120;
+			const bubbleHeight = 80;
+			const bubbleHalfWidth = bubbleWidth / 2;
+			const bubbleHalfHeight = bubbleHeight / 2;
+			const segmentHeight = 120;
+			const eventsPerRow = 4;
+
+			// Calculate positions
+			const positions = [];
+			let currentRow = 0;
+			let currentX = bubbleHalfWidth;
+			let direction = 1; // 1 = left-to-right, -1 = right-to-left
+
+			timelineData.forEach((event, index) => {
+				const row = Math.floor(index / eventsPerRow);
+				const isNewRow = row !== currentRow;
+				
+				if (isNewRow) {
+					currentRow = row;
+					direction = row % 2 === 0 ? 1 : -1;
+					currentX = direction === 1 ? bubbleHalfWidth : svgWidth - bubbleHalfWidth;
+				}
+
+				const yPos = bubbleHalfHeight + row * segmentHeight;
+				const xPos = currentX;
+				
+				positions.push({ x: xPos, y: yPos });
+
+				// Create event element
+				const eventElement = document.createElement('div');
+				eventElement.className = 'timeline-event';
+				eventElement.style.left = `${xPos - bubbleHalfWidth}px`;
+				eventElement.style.top = `${yPos - bubbleHalfHeight}px`;
+				eventElement.textContent = event.EVENT;
+				
+				if (event.TYPE) {
+					eventElement.style.backgroundColor = getColorForType(event.TYPE);
+				}
+				
+				eventElement.addEventListener('click', () => showEventDetails(event));
+				timelineEvents.appendChild(eventElement);
+
+				// Update X position for next event
+				const spacing = (svgWidth - bubbleWidth) / (eventsPerRow - 1);
+				currentX += direction * spacing;
+			});
+
+			// Draw timeline path
+			let pathData = '';
+			positions.forEach((pos, index) => {
+				if (index === 0) {
+					pathData = `M ${pos.x} ${pos.y}`;
+				} else {
+					const prev = positions[index - 1];
+					
+					// Check if we're starting a new row
+					const currentRow = Math.floor(index / eventsPerRow);
+					const prevRow = Math.floor((index - 1) / eventsPerRow);
+					
+					if (currentRow !== prevRow) {
+						// Draw vertical connector between rows
+						pathData += ` L ${prev.x} ${pos.y - segmentHeight/2}`;
+						pathData += ` L ${pos.x} ${pos.y - segmentHeight/2}`;
+					}
+					
+					pathData += ` L ${pos.x} ${pos.y}`;
+				}
+			});
+
+			timelinePath.setAttribute('d', pathData);
+			timelineSvg.setAttribute('height', positions[positions.length - 1].y + bubbleHalfHeight);
+			
+			// Remove existing path
+			document.querySelectorAll('.timeline-path-segment').forEach(p => p.remove());
+
+			// Create color scale
+			const yearColorMap = createYearColorMap();
+
+			// Draw individual path segments
+			positions.forEach((pos, index) => {
+				if (index === 0) return;
+
+				const prevPos = positions[index - 1];
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+				path.classList.add('timeline-path-segment');
+				
+				// Get color from starting event's year
+				const currentEvent = timelineData[index - 1];
+				const startYear = parseDate(currentEvent.START_DATE).getFullYear();
+				path.setAttribute('stroke', yearColorMap[startYear]);
+
+				path.setAttribute('d', `M ${prevPos.x},${prevPos.y} L ${pos.x},${pos.y}`);
+				timelineSvg.appendChild(path);
+			});
+			// Create both legends
+			createLegend(yearColorMap, 'yearLegend');
+			createTypeLegend(eventTypeColorMap, 'typeLegend');
+		}
+
+		// Helper functions
+		function createYearColorMap() {
+			const years = [...new Set(timelineData.map(event => 
+				parseDate(event.START_DATE).getFullYear()
+			))].sort();
+
+			const colorMap = {};
+			years.forEach((year, i) => {
+				const hue = (i * 360) / years.length;
+				colorMap[year] = `hsl(${hue}, 70%, 50%)`;
+			});
+			return colorMap;
+		}
+
+		function getDominantYear(currentEvent, nextEvent) {
+			const startDate = parseDate(currentEvent.START_DATE);
+			const endDate = parseDate(nextEvent.END_DATE);
+			const midTime = startDate.getTime() + (endDate.getTime() - startDate.getTime()) / 2;
+			return new Date(midTime).getFullYear();
+		}
+
+		function createYearGradient(id, startYear, endYear, colorMap) {
+			const defs = timelineSvg.querySelector('defs') || timelineSvg.insertBefore(
+				document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
+				timelineSvg.firstChild
+			);
+
+			const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+			gradient.id = id;
+			gradient.setAttribute('x1', '0%');
+			gradient.setAttribute('y1', '0%');
+			gradient.setAttribute('x2', '100%');
+			gradient.setAttribute('y2', '0%');
+
+			[startYear, endYear].forEach((year, i) => {
+				const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+				stop.setAttribute('offset', `${i * 100}%`);
+				stop.setAttribute('stop-color', colorMap[year]);
+				gradient.appendChild(stop);
+			});
+
+			defs.appendChild(gradient);
+		}
+
+
+        const eventTypeColorMap = {};
+
+		function getColorForType(type) {
+			if (!type) return '#4a6fa5'; // Default color
+			
+			// Return existing color if already defined
+			if (eventTypeColorMap[type]) return eventTypeColorMap[type];
+			
+			// Generate new color
+			const hash = type.split('').reduce((acc, char) => 
+				char.charCodeAt(0) + ((acc << 5) - acc), 0);
+			const hue = Math.abs(hash) % 360;
+			const color = `hsl(${hue}, 70%, 40%)`;
+			
+			// Store in map
+			eventTypeColorMap[type] = color;
+			return color;
+		}
+		
+		// New type legend function
+		function createTypeLegend(colorMap, targetId) {
+			const legend = document.getElementById(targetId);
+			legend.innerHTML = '';
+			
+			const types = Object.keys(colorMap).sort();
+			
+			types.forEach(type => {
+				const item = document.createElement('div');
+				item.className = 'legend-item';
+				item.innerHTML = `
+					<div class="color-swatch" style="background: ${colorMap[type]}"></div>
+					<span class="legend-year">${type}</span>
+				`;
+				
+				legend.appendChild(item);
+			});
+		}
+
+		// Update existing legend function to be reusable
+		function createLegend(colorMap, targetId) {
+			const legend = document.getElementById(targetId);
+			legend.innerHTML = '';
+			
+			const items = Object.keys(colorMap).sort((a, b) => a - b);
+			
+			items.forEach(item => {
+				const element = document.createElement('div');
+				element.className = 'legend-item';
+				element.innerHTML = `
+					<div class="color-swatch" style="background: ${colorMap[item]}"></div>
+					<span class="legend-year">${item}</span>
+				`;
+				
+				legend.appendChild(element);
+			});
+		}
 
         // Show event details in modal
         function showEventDetails(event) {
