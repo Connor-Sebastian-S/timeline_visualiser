@@ -1049,7 +1049,7 @@
 	document.addEventListener('DOMContentLoaded', async () => {
 	    try {
 	        // Try loading default CSV
-	        const csvResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/ww1-timeline.csv');
+	        const csvResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/input.csv');
             if (!csvResponse.ok) throw new Error('Default CSV not found');
 	        const csvData = await csvResponse.text();
 	        
