@@ -888,8 +888,8 @@
 	document.addEventListener('DOMContentLoaded', async () => {
 	    try {
 	        // Try loading default CSV
-	        const csvResponse = await fetch('./ww1-timeline.csv');
-	        if (!csvResponse.ok) throw new Error('Default CSV not found');
+	        const csvResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/ww1-timeline.csv');
+            if (!csvResponse.ok) throw new Error('Default CSV not found');
 	        const csvData = await csvResponse.text();
 	        
 	        // Parse CSV data
@@ -897,7 +897,7 @@
 	        
 	        // Try loading default ZIP images
 	        try {
-	            const zipResponse = await fetch('./images.zip');
+	            const zipResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/images.zip');
 	            if (zipResponse.ok) {
 	                const zipBlob = await zipResponse.blob();
 	                await processZipFile(zipBlob);
@@ -917,9 +917,3 @@
 	    }
 	});
 </script>
-
-	    
-
-	    
-
-        // Hide error message
