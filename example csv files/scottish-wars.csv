@@ -1,0 +1,11 @@
+ID,START_DATE,END_DATE,EVENT,DESCRIPTION,TYPE
+1,30-03-1296,30-03-1296,"English Invasion of Berwick","Edward I of England captures Berwick-upon-Tweed, marking the start of the First War of Scottish Independence.","Invasion"
+2,27-04-1296,27-04-1296,"Battle of Dunbar","Scottish forces under John Balliol are decisively defeated by Edward I's army, establishing English dominance.","Battle"
+3,11-09-1297,11-09-1297,"Battle of Stirling Bridge","William Wallace and Andrew Moray defeat English forces in a tactical victory using bridge defenses.","Battle"
+4,22-07-1298,22-07-1298,"Battle of Falkirk","Edward I defeats Wallace's forces using longbowmen, leading to Wallace's eventual capture.","Battle"
+5,25-03-1306,25-03-1306,"Coronation of Robert the Bruce","Robert the Bruce is crowned King of Scots at Scone, renewing Scottish resistance efforts.","Coronation"
+6,23-06-1314,24-06-1314,"Battle of Bannockburn","Decisive Scottish victory under Robert the Bruce secures de facto independence from England.","Battle"
+7,06-04-1320,06-04-1320,"Declaration of Arbroath","Famous letter to Pope John XXII asserting Scotland's sovereignty and Bruce's legitimacy.","Political"
+8,17-03-1328,17-03-1328,"Treaty of Edinburgh-Northampton","England formally recognizes Scottish independence, ending the First War.","Treaty"
+9,11-08-1332,11-08-1332,"Battle of Dupplin Moor","Edward Balliol's forces defeat Scottish loyalists, beginning the Second War of Independence.","Battle"
+10,19-07-1333,19-07-1333,"Siege of Berwick","Edward III recaptures Berwick-upon-Tweed, reasserting English control over the strategic port.","Siege"
