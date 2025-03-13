@@ -481,6 +481,8 @@
         const lightboxClose = document.querySelector('.lightbox-close');
         const toggleUploadSection = document.getElementById('toggleUploadSection');
         const uploadSection = document.getElementById('uploadSection');
+		
+		const eventTypeColorMap = {};
 
         // Toggle upload section visibility
         toggleUploadSection.addEventListener('click', () => {
@@ -579,43 +581,102 @@
         }
 
         // Process button click
-        processBtn.addEventListener('click', () => {
-            if (!csvFileInput.files.length) {
-                showError('Please upload a CSV file.');
-                return;
-            }
+processBtn.addEventListener('click', () => {
+    if (!csvFileInput.files.length) {
+        showError('Please upload a CSV file.');
+        return;
+    }
 
-            loadingIndicator.style.display = 'block';
-            hideError();
+    // Reset the timeline state before processing new data
+    resetTimelineState();
+    
+    // Continue with processing
+    loadingIndicator.style.display = 'block';
+    hideError();
+    
+    const csvFile = csvFileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = async function(e) {
+        try {
+            const csvData = e.target.result;
+            parseCSV(csvData);
             
-            const csvFile = csvFileInput.files[0];
-            const reader = new FileReader();
+            if (imagesFileInput.files.length) {
+                await processZipFile(imagesFileInput.files[0]);
+            }
             
-            reader.onload = async function(e) {
-                try {
-                    const csvData = e.target.result;
-                    parseCSV(csvData);
-                    
-                    if (imagesFileInput.files.length) {
-                        await processZipFile(imagesFileInput.files[0]);
-                    }
-                    
-                    renderTimeline();
-                    showSuccess('Data processed successfully!');
-                } catch (error) {
-                    showError('Error processing data: ' + error.message);
-                } finally {
-                    loadingIndicator.style.display = 'none';
-                }
-            };
-            
-            reader.onerror = function() {
-                showError('Error reading the CSV file.');
-                loadingIndicator.style.display = 'none';
-            };
-            
-            reader.readAsText(csvFile);
-        });
+            renderTimeline();
+            showSuccess('Data processed successfully!');
+        } catch (error) {
+            showError('Error processing data: ' + error.message);
+        } finally {
+            loadingIndicator.style.display = 'none';
+        }
+    };
+    
+    reader.onerror = function() {
+        showError('Error reading the CSV file.');
+        loadingIndicator.style.display = 'none';
+    };
+    
+    reader.readAsText(csvFile);
+});
+
+// Function to reset timeline state
+function resetTimelineState() {
+    // Clear data arrays and objects
+    timelineData = [];
+    
+    // Clear image files more thoroughly
+    // First, remove any DOM elements that might be using the images
+    const eventImagesDiv = document.getElementById('eventImages');
+    if (eventImagesDiv) {
+        eventImagesDiv.innerHTML = '';
+    }
+    
+    // Clear the lightbox image source
+    const lightboxImg = document.getElementById('lightboxImage');
+    if (lightboxImg) {
+        lightboxImg.src = '';
+    }
+    
+    // Now reset the imageFiles object
+    imageFiles = {};
+    
+    // Clear the event type color mapping
+    Object.keys(eventTypeColorMap).forEach(key => {
+        delete eventTypeColorMap[key];
+    });
+    
+    // Reset the timeline UI elements
+    timelineEvents.innerHTML = '';
+    timelinePath.setAttribute('d', '');
+    
+    // Clear legend displays
+    document.getElementById('yearLegend').innerHTML = '';
+    document.getElementById('typeLegend').innerHTML = '';
+    
+    // Clear any existing path segments
+    document.querySelectorAll('.timeline-path-segment').forEach(p => p.remove());
+    
+    // Reset success/error messages
+    hideError();
+    
+    // Clear event labels
+    csvFileName.textContent = '';
+    imagesFileName.textContent = '';
+    
+    // If you want to also reset the file inputs, uncomment these lines
+    // csvFileInput.value = '';
+    // imagesFileInput.value = '';
+    
+    // Close any open modals
+    document.getElementById('eventModal').style.display = 'none';
+    document.getElementById('imageLightbox').style.display = 'none';
+    
+    console.log('Timeline state has been reset');
+}
 
         // Parse CSV data
         function parseCSV(csvData) {
@@ -916,7 +977,7 @@
 		}
 
 
-        const eventTypeColorMap = {};
+        
 
 		function getColorForType(type) {
 			if (!type) return '#4a6fa5'; // Default color
