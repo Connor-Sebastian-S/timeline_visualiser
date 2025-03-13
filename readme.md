@@ -1,16 +1,16 @@
 # Interactive Timeline Visualiser
 
-A sophisticated web-based tool that enables users to create visually appealing, interactive timelines from structured CSV data with optional image support.
+A web-based tool that enables users to create visually appealing, interactive timelines from structured CSV data with optional image support.
 
 https://connor-sebastian-s.github.io/timeline_visualiser/
 
 ## Overview
 
-The Interactive Timeline Visualiser transforms chronological data into an engaging visual experience. Users can upload CSV data containing event information along with accompanying images to generate an interactive timeline that displays events along a flowing path. Each event is represented by a clickable bubble that reveals detailed information and associated images when selected.
+The Interactive Timeline Visualiser transforms chronological data into a visual experience. Users can upload CSV data containing event information along with accompanying images to generate an interactive timeline that displays events along a flowing path. Each event is represented by a clickable bubble that reveals detailed information and associated images when selected.
 
 ## Features
 
-- **Intuitive Data Input**: Upload timeline data via a simple CSV format with drag-and-drop functionality
+- **Data Input**: Upload timeline data via a simple CSV format with drag-and-drop functionality
 - **Image Support**: Include images for each event by uploading a ZIP file with organised folders
 - **Interactive Visualisation**: Navigate through events displayed on a dynamic, flowing timeline
 - **Detailed Event View**: Click on events to view comprehensive information including dates, descriptions, and associated images
@@ -73,6 +73,7 @@ No installation is required. Simply download the HTML file and open it in a web 
 4. Click "Process Data" to generate the timeline
 5. Interact with the timeline by clicking on event bubbles to view detailed information
 6. View images in full-screen mode by clicking on them in the event detail view
+7. The website has default files it loads automatically if they are present; input.csv and images.zip.
 
 ## Customisation
 
