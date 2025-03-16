@@ -280,40 +280,6 @@
             border-radius: 4px;
             display: none;
         }
-		
-		@media (max-width: 768px) {
-  .timeline-event {
-    left: 50% !important;
-    transform: translateX(-50%);
-    width: 70px;
-    height: 70px;
-    font-size: 12px;
-  }
-
-  .timeline-container {
-    min-height: auto;
-    margin: 20px 0;
-  }
-
-  .modal-content {
-    width: 95%;
-    margin: 15% auto;
-    padding: 15px;
-  }
-
-  .event-images img {
-    max-width: 100%;
-    max-height: 150px;
-  }
-
-  .upload-container {
-    padding: 15px;
-  }
-
-  .instructions p {
-    font-size: 14px;
-  }
-}
     </style>
 </head>
 <body>
@@ -685,111 +651,114 @@
             return extensions.some(ext => fileName.endsWith(ext));
         }
 
+        // Render the timeline
         function renderTimeline() {
-    if (!timelineData.length) return;
-
-    // Clear previous content
-    timelineEvents.innerHTML = '';
-
-    // Mobile detection
-    const isMobile = window.innerWidth <= 768;
-    const bubbleSize = isMobile ? 70 : 80;
-    const bubbleRadius = bubbleSize / 2;
-    const svgWidth = timelineContainer.clientWidth;
-    
-    // Set SVG dimensions and initialize positions
-    let pathHeight = 0;
-    let positions = [];
-    let pathData = '';
-
-    if (isMobile) {
-        // Mobile layout - vertical timeline
-        const spacing = 100;
-        pathHeight = timelineData.length * spacing;
-
-        // Create vertical positions
-        timelineData.forEach((event, index) => {
-            positions.push({
-                x: svgWidth / 2,
-                y: bubbleRadius + (index * spacing)
-            });
-        });
-
-        // Create vertical line path
-        pathData = `M ${svgWidth/2} ${bubbleRadius} L ${svgWidth/2} ${pathHeight}`;
-    } else {
-        // Desktop layout - original zigzag pattern
-        const segmentHeight = 120;
-        const numRows = Math.ceil(timelineData.length / 2);
-        pathHeight = numRows * segmentHeight;
-        const lineWidth = svgWidth - bubbleSize;
-
-        // Calculate positions for zigzag layout
-        for (let i = 0; i < timelineData.length; i++) {
-            const row = Math.floor(i / 2);
-            const isEven = i % 2 === 0;
-            const rowY = bubbleRadius + row * segmentHeight;
-            let posX;
-
-            if (row % 2 === 0) {
-                const rowProgress = isEven ? 0.25 : 0.75;
-                posX = bubbleRadius + rowProgress * lineWidth;
-            } else {
-                const rowProgress = isEven ? 0.75 : 0.25;
-                posX = bubbleRadius + (1 - rowProgress) * lineWidth;
-            }
-
-            positions.push({ x: posX, y: rowY });
-        }
-
-        // Create zigzag path
-        if (positions.length > 0) {
-            pathData = `M ${positions[0].x} ${positions[0].y}`;
+            if (!timelineData.length) return;
             
-            for (let i = 1; i < positions.length; i++) {
-                const prev = positions[i-1];
-                const curr = positions[i];
+            // Clear previous content
+            timelineEvents.innerHTML = '';
+            
+            // Set SVG dimensions
+            const svgWidth = timelineContainer.clientWidth;
+            const bubbleSize = 80; // Match the CSS width/height
+            const bubbleRadius = bubbleSize / 2;
+            const segmentHeight = 120; // Increased to accommodate larger bubbles
+            const numEvents = timelineData.length;
+            const numRows = Math.ceil(numEvents / 2);
+            const pathHeight = numRows * segmentHeight;
+            
+            // Update SVG height
+            timelineSvg.setAttribute('height', pathHeight + bubbleSize);
+            
+            // Generate squiggle path
+            let pathData = `M ${bubbleRadius} ${bubbleRadius}`;
+            let x = bubbleRadius;
+            let y = bubbleRadius;
+            const lineWidth = svgWidth - bubbleSize;
+            
+            const positions = [];
+            
+            // Calculate positions for each event
+            for (let i = 0; i < numEvents; i++) {
+                const row = Math.floor(i / 2);
+                const isEven = i % 2 === 0;
+                const rowY = bubbleRadius + row * segmentHeight;
+                let posX;
                 
-                if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
-                    if (Math.floor((i-1) / 2) % 2 === 0) {
-                        pathData += ` L ${svgWidth - bubbleRadius} ${prev.y}`;
-                        pathData += ` L ${svgWidth - bubbleRadius} ${curr.y}`;
-                        pathData += ` L ${curr.x} ${curr.y}`;
+                if (row % 2 === 0) {
+                    // Left to right row
+                    const rowProgress = isEven ? 0.25 : 0.75;
+                    posX = bubbleRadius + rowProgress * lineWidth;
+                } else {
+                    // Right to left row
+                    const rowProgress = isEven ? 0.75 : 0.25;
+                    posX = bubbleRadius + (1 - rowProgress) * lineWidth;
+                }
+                
+                positions.push({ x: posX, y: rowY });
+            }
+            
+            // Create path that only goes through the positions
+            if (positions.length > 0) {
+                pathData = `M ${positions[0].x} ${positions[0].y}`;
+                
+                for (let i = 1; i < positions.length; i++) {
+                    const prev = positions[i-1];
+                    const curr = positions[i];
+                    
+                    // If moving to a new row
+                    if (Math.floor((i-1) / 2) !== Math.floor(i / 2)) {
+                        // Complete the current row
+                        if (Math.floor((i-1) / 2) % 2 === 0) {
+                            // End of left-to-right row
+                            pathData += ` L ${svgWidth - bubbleRadius} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${svgWidth - bubbleRadius} ${curr.y}`;
+                            // Start right-to-left
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        } else {
+                            // End of right-to-left row
+                            pathData += ` L ${bubbleRadius} ${prev.y}`;
+                            // Go down
+                            pathData += ` L ${bubbleRadius} ${curr.y}`;
+                            // Start left-to-right
+                            pathData += ` L ${curr.x} ${curr.y}`;
+                        }
                     } else {
-                        pathData += ` L ${bubbleRadius} ${prev.y}`;
-                        pathData += ` L ${bubbleRadius} ${curr.y}`;
+                        // Within same row, just draw to next point
                         pathData += ` L ${curr.x} ${curr.y}`;
                     }
-                } else {
-                    pathData += ` L ${curr.x} ${curr.y}`;
                 }
             }
+            
+            timelinePath.setAttribute('d', pathData);
+            
+            // Place events along the path
+            timelineData.forEach((event, index) => {
+                const position = positions[index];
+                
+                // Create event bubble
+                const eventBubble = document.createElement('div');
+                eventBubble.className = 'timeline-event';
+                eventBubble.style.left = `${position.x - bubbleRadius}px`;
+                eventBubble.style.top = `${position.y - bubbleRadius}px`;
+                
+                // Set color based on type if available
+                if (event.TYPE) {
+                    eventBubble.style.backgroundColor = getColorForType(event.TYPE);
+                }
+                
+                // Add event text
+                eventBubble.textContent = event.EVENT;
+                
+                // Add click event
+                eventBubble.addEventListener('click', () => {
+                    showEventDetails(event);
+                });
+                
+                timelineEvents.appendChild(eventBubble);
+            });
         }
-    }
-
-    // Update SVG dimensions and path
-    timelineSvg.setAttribute('height', pathHeight + bubbleSize);
-    timelinePath.setAttribute('d', pathData);
-
-    // Create event bubbles
-    timelineData.forEach((event, index) => {
-        const position = positions[index];
-        
-        const eventBubble = document.createElement('div');
-        eventBubble.className = 'timeline-event';
-        eventBubble.style.left = `${position.x - bubbleRadius}px`;
-        eventBubble.style.top = `${position.y - bubbleRadius}px`;
-        
-        if (event.TYPE) {
-            eventBubble.style.backgroundColor = getColorForType(event.TYPE);
-        }
-        
-        eventBubble.textContent = event.EVENT;
-        eventBubble.addEventListener('click', () => showEventDetails(event));
-        
-        timelineEvents.appendChild(eventBubble);
-    });
-}
 
         // Get color based on event type
         // Get color based on event type with randomized but consistent colours
@@ -880,11 +849,12 @@
             errorMessage.style.display = 'none';
         }
 
+        // Handle window resize
         window.addEventListener('resize', () => {
-			if (timelineData.length) {
-				renderTimeline(); // Re-render on resize
-			}
-		});
+            if (timelineData.length) {
+                renderTimeline();
+            }
+        });
     </script>
 </body>
 </html>
