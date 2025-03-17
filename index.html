@@ -494,7 +494,7 @@
       // from the local directory.
       function loadDefaults() {
         // Load the CSV
-        fetch("timeline.csv")
+        fetch("https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/timeline.csv")
           .then((response) => response.text())
           .then((csvText) => {
             Papa.parse(csvText, {
@@ -528,7 +528,7 @@
           .catch((err) => console.error("Error loading CSV:", err));
 
         // Load the default ZIP
-        fetch("default.zip")
+        fetch("https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/default.zip")
           .then((response) => {
             if (!response.ok)
               throw new Error("Network response was not ok.");
