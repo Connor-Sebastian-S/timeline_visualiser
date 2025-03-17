@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>Timeline Viewer</title>
+    <style>
+      /* Basic reset and body styling */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        padding: 20px;
+      }
+
+      /* Upload container styling */
+      #upload-container {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      #upload-container input[type="file"] {
+        margin: 0 10px;
+      }
+
+      #upload-container label {
+        margin-left: 20px;
+        font-weight: bold;
+      }
+
+      /* Timeline scale container */
+      #timeline-scale-container {
+        margin: 20px 0;
+        position: relative;
+        width: 100%;
+      }
+
+      #timeline-scale {
+        width: 100%;
+        height: 50px;
+      }
+
+      /* Timeline container styling */
+      #timeline-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      /* Each row will contain a subset of events */
+      .timeline-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: relative;
+        padding: 10px 0;
+      }
+
+      /* Reverse row (for the snake effect on desktop) */
+      .timeline-row.reverse {
+        flex-direction: row-reverse;
+      }
+
+      /* Event box styling */
+      .event-box {
+        background: #fff;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        width: 22%;
+        min-width: 120px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .event-box:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .event-date {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .event-name {
+        font-size: 0.9rem;
+      }
+
+      /* Modal popup styling */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 600px;
+        position: relative;
+        border-radius: 8px;
+      }
+
+      .modal-content h2 {
+        margin-bottom: 10px;
+      }
+
+      .modal-content p {
+        margin-bottom: 15px;
+      }
+
+      .close {
+        color: #aaa;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover {
+        color: #000;
+      }
+
+      /* Thumbnail images in modal */
+      .modal-images {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+
+      .modal-images img.thumbnail {
+        height: 80px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        transition: transform 0.2s;
+      }
+
+      .modal-images img.thumbnail:hover {
+        transform: scale(1.1);
+      }
+
+      /* Image modal for enlarged view */
+      .image-modal-content {
+        max-width: 90%;
+      }
+
+      #enlarged-image {
+        width: 100%;
+        display: block;
+        max-height: 80vh;
+        object-fit: contain;
+      }
+
+      /* Mobile responsive styling */
+      @media (max-width: 600px) {
+        .timeline-row {
+          flex-direction: column;
+        }
+
+        .event-box {
+          width: 90%;
+          margin: 0 auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Upload controls (CSV is required, ZIP is optional) -->
+    <div id="upload-container">
+      <input type="file" id="csvInput" accept=".csv" />
+      <input type="file" id="zipInput" accept=".zip" />
+      <label>
+        <input type="checkbox" id="colorToggle" />
+        Color by Type
+      </label>
+    </div>
+
+    <!-- Timeline scale: shows a horizontal scale with year ticks -->
+    <div id="timeline-scale-container">
+      <svg id="timeline-scale"></svg>
+    </div>
+
+    <!-- Timeline container where event boxes will appear -->
+    <div id="timeline-container"></div>
+
+    <!-- Modal popup for event details -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="modalClose">&times;</span>
+        <h2 id="modal-title"></h2>
+        <p id="modal-description"></p>
+        <div id="modal-images" class="modal-images"></div>
+      </div>
+    </div>
+
+    <!-- Modal popup for enlarged images -->
+    <div id="image-modal" class="modal">
+      <div class="modal-content image-modal-content">
+        <span class="close" id="imageModalClose">&times;</span>
+        <img id="enlarged-image" src="" alt="Enlarged Image" />
+      </div>
+    </div>
+
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js"></script>
+    <!-- JSZip for unzip functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+      // Global variables
+      let eventsData = [];
+      let zipObj = null;
+      const COLORS = [
+        "#f44336",
+        "#e91e63",
+        "#9c27b0",
+        "#673ab7",
+        "#3f51b5",
+        "#2196f3",
+        "#03a9f4",
+        "#00bcd4",
+        "#009688",
+        "#4caf50",
+        "#8bc34a",
+        "#cddc39",
+        "#ffeb3b",
+        "#ffc107",
+        "#ff9800",
+        "#ff5722",
+      ];
+      let typeColorMapping = {};
+
+      // Helper function to parse date strings formatted as DD-MM-YYYY
+      function parseDate(str) {
+        const parts = str.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+
+      // Returns a unique color (cycling through COLORS) for an event type
+      function getColorForType(type) {
+        if (!typeColorMapping[type]) {
+          const color =
+            COLORS[Object.keys(typeColorMapping).length % COLORS.length];
+          typeColorMapping[type] = color;
+        }
+        return typeColorMapping[type];
+      }
+
+      // Render the timeline on the page: arrange events in rows that alternate
+      // direction (left-to-right then right-to-left) to create a “snake
+      // layout.”
+      function renderTimeline() {
+        const container = document.getElementById("timeline-container");
+        container.innerHTML = "";
+        const colorByType = document.getElementById("colorToggle").checked;
+
+        // Determine events per row based on screen width:
+        // Mobile (narrow screens) use one column; desktop use 4 per row.
+        const eventsPerRow = window.innerWidth < 600 ? 1 : 4;
+
+        // Group events into rows and create event boxes.
+        for (let i = 0; i < eventsData.length; i += eventsPerRow) {
+          const rowEvents = eventsData.slice(i, i + eventsPerRow);
+          const rowDiv = document.createElement("div");
+          rowDiv.classList.add("timeline-row");
+          // Reverse every other row
+          if (Math.floor(i / eventsPerRow) % 2 === 1) {
+            rowDiv.classList.add("reverse");
+          }
+          rowEvents.forEach((event) => {
+            const eventBox = document.createElement("div");
+            eventBox.classList.add("event-box");
+            if (colorByType) {
+              eventBox.style.backgroundColor = getColorForType(event.TYPE);
+            }
+            eventBox.innerHTML =
+              "<div class='event-date'>" +
+              event.DATE +
+              "</div>" +
+              "<div class='event-name'>" +
+              event.NAME +
+              "</div>";
+            eventBox.addEventListener("click", () => openModal(event));
+            rowDiv.appendChild(eventBox);
+          });
+          container.appendChild(rowDiv);
+        }
+        // Update the global timeline scale (year ticks)
+        renderTimelineScale();
+      }
+
+      // Render an SVG timeline scale (a horizontal line with year tick marks)
+      function renderTimelineScale() {
+        const svg = document.getElementById("timeline-scale");
+        while (svg.firstChild) {
+          svg.removeChild(svg.firstChild);
+        }
+        const containerWidth = document
+          .getElementById("timeline-scale-container")
+          .getBoundingClientRect().width;
+        svg.setAttribute("width", containerWidth);
+        svg.setAttribute("height", "50");
+        if (eventsData.length === 0) return;
+
+        // Compute the global minimum and maximum year
+        const years = eventsData.map((e) =>
+          parseDate(e.DATE).getFullYear()
+        );
+        const minYear = Math.min(...years);
+        const maxYear = Math.max(...years);
+        const totalYears = maxYear - minYear;
+
+        // Draw the horizontal base line
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line"
+        );
+        line.setAttribute("x1", "0");
+        line.setAttribute("y1", "25");
+        line.setAttribute("x2", containerWidth);
+        line.setAttribute("y2", "25");
+        line.setAttribute("stroke", "#000");
+        line.setAttribute("stroke-width", "2");
+        svg.appendChild(line);
+
+        // Add a tick (and label) for each year in the range.
+        for (let year = minYear; year <= maxYear; year++) {
+          const x =
+            totalYears === 0
+              ? containerWidth / 2
+              : ((year - minYear) / totalYears) * containerWidth;
+          const tick = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+          );
+          tick.setAttribute("x1", x);
+          tick.setAttribute("y1", "20");
+          tick.setAttribute("x2", x);
+          tick.setAttribute("y2", "30");
+          tick.setAttribute("stroke", "#000");
+          tick.setAttribute("stroke-width", "2");
+          svg.appendChild(tick);
+          const text = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text"
+          );
+          text.setAttribute("x", x + 2);
+          text.setAttribute("y", "15");
+          text.setAttribute("font-size", "12");
+          text.textContent = year;
+          svg.appendChild(text);
+        }
+      }
+
+      // When an event box is clicked, open the modal popup showing
+      // the event’s details and any images corresponding to its ID.
+      function openModal(event) {
+        const modal = document.getElementById("modal");
+        document.getElementById("modal-title").textContent =
+          event.DATE + " - " + event.NAME;
+        document.getElementById("modal-description").textContent =
+          event.DESCRIPTION;
+        const imagesDiv = document.getElementById("modal-images");
+        imagesDiv.innerHTML = "";
+
+        if (zipObj) {
+          // Attempt to get the folder in the ZIP file that matches the event’s ID.
+          const folder = zipObj.folder(event.ID);
+          if (folder) {
+            const imageFiles = [];
+            folder.forEach((relativePath, file) => {
+              if (/\.(jpg|jpeg|png|gif)$/i.test(file.name)) {
+                imageFiles.push(file);
+              }
+            });
+            if (imageFiles.length > 0) {
+              imageFiles.forEach((file) => {
+                file.async("blob").then((blob) => {
+                  const url = URL.createObjectURL(blob);
+                  const img = document.createElement("img");
+                  img.src = url;
+                  img.classList.add("thumbnail");
+                  img.addEventListener("click", () => {
+                    showLargeImage(url);
+                  });
+                  imagesDiv.appendChild(img);
+                });
+              });
+            } else {
+              imagesDiv.innerHTML =
+                "<p>No images found for this event.</p>";
+            }
+          } else {
+            imagesDiv.innerHTML =
+              "<p>No images available for this event.</p>";
+          }
+        }
+        modal.style.display = "block";
+      }
+
+      // When a thumbnail image is clicked, show the enlarged version in a
+      // separate modal.
+      function showLargeImage(url) {
+        const imageModal = document.getElementById("image-modal");
+        document.getElementById("enlarged-image").src = url;
+        imageModal.style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
+
+      function closeImageModal() {
+        document.getElementById("image-modal").style.display = "none";
+      }
+
+      // Handle CSV file upload. Uses PapaParse to parse the CSV.
+      function handleCSVFile(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const csvData = e.target.result;
+          Papa.parse(csvData, {
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+              const requiredCols = [
+                "ID",
+                "DATE",
+                "NAME",
+                "DESCRIPTION",
+                "TYPE",
+              ];
+              if (
+                results.meta.fields &&
+                requiredCols.every((col) =>
+                  results.meta.fields.includes(col)
+                )
+              ) {
+                eventsData = results.data;
+                // Sort events chronologically (by DATE)
+                eventsData.sort(
+                  (a, b) => parseDate(a.DATE) - parseDate(b.DATE)
+                );
+                renderTimeline();
+              } else {
+                alert(
+                  "CSV file must contain the columns: " +
+                    requiredCols.join(", ")
+                );
+              }
+            },
+          });
+        };
+        reader.readAsText(file);
+      }
+
+      // Handle ZIP file upload. Loads the zip via JSZip.
+      function handleZipFile(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          JSZip.loadAsync(e.target.result).then(function (zip) {
+            zipObj = zip;
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Load the default CSV (timeline.csv) and default ZIP (default.zip)
+      // from the local directory.
+      function loadDefaults() {
+        // Load the CSV
+        fetch("timeline.csv")
+          .then((response) => response.text())
+          .then((csvText) => {
+            Papa.parse(csvText, {
+              header: true,
+              skipEmptyLines: true,
+              complete: function (results) {
+                const requiredCols = [
+                  "ID",
+                  "DATE",
+                  "NAME",
+                  "DESCRIPTION",
+                  "TYPE",
+                ];
+                if (
+                  results.meta.fields &&
+                  requiredCols.every((col) =>
+                    results.meta.fields.includes(col)
+                  )
+                ) {
+                  eventsData = results.data;
+                  eventsData.sort(
+                    (a, b) => parseDate(a.DATE) - parseDate(b.DATE)
+                  );
+                  renderTimeline();
+                } else {
+                  alert("Default CSV file is missing required columns.");
+                }
+              },
+            });
+          })
+          .catch((err) => console.error("Error loading CSV:", err));
+
+        // Load the default ZIP
+        fetch("default.zip")
+          .then((response) => {
+            if (!response.ok)
+              throw new Error("Network response was not ok.");
+            return response.arrayBuffer();
+          })
+          .then((arrayBuffer) => JSZip.loadAsync(arrayBuffer))
+          .then((zip) => {
+            zipObj = zip;
+          })
+          .catch((err) => {
+            console.log("No default zip loaded:", err);
+          });
+      }
+
+      // Attach file input event listeners
+      document
+        .getElementById("csvInput")
+        .addEventListener("change", function (e) {
+          if (e.target.files.length) {
+            handleCSVFile(e.target.files[0]);
+          }
+        });
+
+      document
+        .getElementById("zipInput")
+        .addEventListener("change", function (e) {
+          if (e.target.files.length) {
+            handleZipFile(e.target.files[0]);
+          }
+        });
+
+      // Attach modal close events
+      document
+        .getElementById("modalClose")
+        .addEventListener("click", closeModal);
+      document
+        .getElementById("imageModalClose")
+        .addEventListener("click", closeImageModal);
+
+      // Clicking outside a modal will close it.
+      window.addEventListener("click", function (e) {
+        const modal = document.getElementById("modal");
+        if (e.target === modal) {
+          closeModal();
+        }
+        const imageModal = document.getElementById("image-modal");
+        if (e.target === imageModal) {
+          closeImageModal();
+        }
+      });
+
+      // Toggle event to (re)render timeline if "Color by Type" is selected.
+      document
+        .getElementById("colorToggle")
+        .addEventListener("change", renderTimeline);
+
+      // Re-render timeline on window resize (for responsiveness)
+      window.addEventListener("resize", renderTimeline);
+
+      // On page load, fetch the default CSV and ZIP files.
+      window.onload = loadDefaults;
+    </script>
+  </body>
+</html>
