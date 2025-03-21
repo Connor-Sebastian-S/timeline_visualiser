@@ -572,6 +572,7 @@ function generateColorKey() {
     // Extract unique TYPE values from eventData
     const uniqueTypes = [...new Set(eventData.map(event => event.TYPE).filter(type => type !== ''))];
 
+
     // If there are no types, hide the legend
     if (uniqueTypes.length === 0 || !colorByType) {
         colorKeyContainer.style.display = 'none';
@@ -597,7 +598,8 @@ function generateColorKey() {
         colorBox.style.borderRadius = '4px';
 
         const label = document.createElement('span');
-        label.textContent = type;
+        label.textContent = type; 
+
 
         item.appendChild(colorBox);
         item.appendChild(label);
