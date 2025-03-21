@@ -1,19 +1,32 @@
 ID,START_DATE,END_DATE,NAME,DESCRIPTION,TYPE
-1,28-06-1914,28-06-1914,Assassination of Archduke Franz Ferdinand,"Archduke Franz Ferdinand of Austria and his wife Sophie are assassinated by Serbian nationalist Gavrilo Princip in Sarajevo, Bosnia. This event is widely considered the immediate trigger of World War I.",Political
-2,28-07-1914,28-07-1914,Austria-Hungary Declares War on Serbia,"After issuing an ultimatum that was only partially accepted, Austria-Hungary declares war on Serbia, officially beginning World War I.",Military
-3,01-08-1914,03-08-1914,Germany Declares War,"Germany declares war on Russia (August 1) and France (August 3), implementing the Schlieffen Plan for a two-front war.",Military
-4,04-08-1914,04-08-1914,Britain Enters the War,"Following Germany's invasion of neutral Belgium, Britain declares war on Germany, bringing the British Empire into the conflict.",Military
-5,05-09-1914,12-09-1914,First Battle of the Marne,"French and British forces halt the German advance toward Paris. The battle marks the failure of Germany's Schlieffen Plan and leads to the trench warfare that would characterize the Western Front for the next four years.",Battle
-6,26-04-1915,19-05-1915,Treaty of London,"The secret Treaty of London is signed between the Triple Entente and Italy. Italy agrees to join the Allied war effort in exchange for territorial concessions after the war.",Diplomatic
-7,25-04-1915,09-01-1916,Gallipoli Campaign,"Allied forces launch a failed campaign to capture the Ottoman capital of Constantinople and secure a sea route to Russia. The campaign results in over 250,000 casualties on both sides and is considered a major Allied failure.",Battle
-8,07-05-1915,07-05-1915,Sinking of the Lusitania,"The British passenger liner RMS Lusitania is torpedoed by a German U-boat, killing 1,198 passengers, including 128 Americans. The sinking turns public opinion in the United States against Germany.",Naval
-9,21-02-1916,18-12-1916,Battle of Verdun,"One of the longest and bloodiest battles of the war, with an estimated 700,000 casualties. The German strategy was to 'bleed France white' through attrition, but neither side gained significant advantage.",Battle
-10,01-07-1916,18-11-1916,Battle of the Somme,"The Allied offensive on the Western Front results in over one million casualties. The first day of the battle sees the British Army suffer its worst single-day casualties in its history with nearly 60,000 casualties.",Battle
-11,06-04-1917,06-04-1917,United States Enters the War,"Following the resumption of unrestricted submarine warfare by Germany and the revelation of the Zimmermann Telegram, the United States declares war on Germany.",Military
-12,07-11-1917,07-11-1917,Russian Revolution,"The Bolsheviks, led by Vladimir Lenin, overthrow the provisional government in Russia. This eventually leads to Russia's withdrawal from the war.",Political
-13,03-03-1918,03-03-1918,Treaty of Brest-Litovsk,"Soviet Russia signs a peace treaty with the Central Powers, formally ending its participation in the war. The treaty imposed severe terms on Russia, ceding vast territories.",Diplomatic
-14,21-03-1918,18-07-1918,German Spring Offensive,"Germany launches its last major offensive on the Western Front in an attempt to win the war before American troops arrive in significant numbers. Initial gains are quickly reversed by Allied counteroffensives.",Battle
-15,08-08-1918,11-11-1918,Hundred Days Offensive,"The final Allied offensive that ultimately leads to the end of the war. It begins with the Battle of Amiens, which German General Ludendorff describes as 'the black day of the German Army.'",Battle
-16,11-11-1918,11-11-1918,Armistice of Compiègne,"An armistice is signed between the Allies and Germany in a railroad car in the Forest of Compiègne, France, effectively ending World War I. The ceasefire takes effect at the 11th hour of the 11th day of the 11th month.",Diplomatic
-17,28-06-1919,28-06-1919,Treaty of Versailles,"The peace treaty that officially ends the state of war between Germany and the Allied Powers. The treaty requires Germany to accept responsibility for the war, make territorial concessions, and pay reparations.",Diplomatic
-18,10-01-1920,10-01-1920,League of Nations Established,"The League of Nations, an international organization designed to prevent future wars, is formally established following the Paris Peace Conference. The United States never joins, weakening its effectiveness from the start.",Diplomatic
+1,01-01-0830,01-01-0830,Pictish Stone Carvings,"Earliest dated carved stones created by Pictish inhabitants near Abernethy, depicting symbolic animals and Celtic crosses.",Cultural
+2,01-01-1114,01-01-1114,Founding of Scone Abbey,"The Augustinian Scone Abbey is established, later becoming the coronation site of Scottish kings.",Religious
+3,12-06-1160,12-06-1160,Perth Royal Charter,"King Malcolm IV grants Perth its first royal charter, establishing it as a burgh with trading privileges.",Political
+4,01-01-1237,01-01-1237,Blackfriars Monastery,"Dominican friars establish Perth's Blackfriars Monastery, becoming a center of medieval learning.",Religious
+5,10-09-1396,10-09-1396,Battle of the North Inch,"Clan combat before King Robert III: 30vs30 judicial duel between Clan Chattan and Clan Kay in Perth.",Military
+6,01-05-1437,01-05-1437,Assassination of James I,"King James I murdered in Perth's Blackfriars Monastery by disgruntled nobles led by Sir Robert Graham.",Political
+7,15-03-1559,15-05-1559,Reformation Riots,"Protestant reformers led by John Knox destroy Scone Abbey and Perth's monastic buildings.",Religious
+8,01-01-1600,01-01-1600,Perth's Final Charter,"King James VI grants Perth its final royal charter confirming special trading rights with the Low Countries.",Political
+9,01-09-1715,10-11-1715,Jacobite Occupation,"Jacobite forces under Earl of Mar make Perth their headquarters during 1715 uprising.",Military
+10,01-01-1745,01-02-1746,1745 Jacobite Campaign,"Bonnie Prince Charlie's army occupies Perth twice during the '45 rebellion, recruiting local clans.",Military
+11,01-01-1760,01-01-1760,Linen Trade Boom,"Perth becomes Scotland's main linen production center with 1,800 handlooms operating.",Economic
+12,12-07-1771,12-07-1771,Tay Bridge Disaster,"Original Perth Bridge over River Tay collapses during construction, killing 12 workers.",Infrastructure
+13,01-01-1807,01-01-1807,Perth Museum Founded,"One of Scotland's oldest museums established by the Perth Literary & Antiquarian Society.",Cultural
+14,22-05-1848,22-05-1848,Perth Railway Opening,"Scottish Central Railway connects Perth to Edinburgh and Glasgow.",Infrastructure
+15,01-01-1852,01-01-1852,Black Watch Homecoming,"Perth welcomes back the 42nd Regiment (Black Watch) from Crimean War with grand parade.",Military
+16,01-06-1865,01-06-1865,Perth Gas Works,"First gas lighting system installed in Perth streets.",Infrastructure
+17,01-01-1881,01-01-1881,Tay Salmon Fisheries,"Record catch of 3,000 salmon in one day at Perth's historic fishing stations.",Economic
+18,01-01-1901,01-01-1901,Perth City Hall,"Grand Edwardian city hall opens with distinctive clock tower.",Infrastructure
+19,01-01-1930,01-01-1935,Tummel Hydro Scheme,"Construction of Loch Tummel dam brings hydroelectric power to Highland Perthshire.",Infrastructure
+20,10-05-1935,10-05-1935,Perth Airport Opens,"Scotland's first municipal airport operational at Scone.",Infrastructure
+21,01-09-1939,01-09-1945,WWII Preparations,"Perth becomes hub for military training with camps at Scone Palace grounds.",Military
+22,01-01-1947,01-01-1947,Perth Festival Launch,"First Perth Festival of the Arts establishing annual cultural event.",Cultural
+23,16-05-1975,16-05-1975,Local Government Reform,"Perthshire merges with Kinross-shire to form Perth and Kinross district.",Political
+24,01-06-1988,01-06-1988,Perth High Street Fire,"Devastating fire destroys historic buildings; reconstruction preserves medieval street plan.",Disaster
+25,01-01-1995,01-01-1995,Forestry Expansion,"Tay Forest Park established - largest man-made forest in UK.",Environmental
+26,14-03-2012,14-03-2012,City Status Regained,"Perth regains city status for Queen's Diamond Jubilee.",Political
+27,01-01-2017,01-01-2017,V&A Dundee Impact,"Though in Dundee, the design museum's opening boosts tourism across Perthshire.",Economic
+28,01-01-2020,31-12-2023,Perthshire 800,"Celebrations for 800th anniversary of 1220 royal charter.",Cultural
+29,15-09-2021,15-09-2021,UNESCO Folk Festival,"Perth hosts first UNESCO-recognized Scottish folk music festival.",Cultural
+30,01-01-2023,01-01-2023,Rewilding Project,"20,000-acre Highland estate begins major rewilding initiative with lynx reintroduction.",Environmental
+31,01-01-2025,01-01-2025,Stone of Destiny Return,"Historic coronation stone permanently returns to Perth Museum from London.",Cultural
