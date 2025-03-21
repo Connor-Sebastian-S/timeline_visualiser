@@ -462,25 +462,19 @@
         // Hide loading initially
         loading.style.display = 'none';
         
-        // Function to parse CSV data
         function parseCSV(text) {
-            const lines = text.split('\n');
-            const headers = lines[0].split(',').map(header => header.trim());
-            
+            const rows = text.split('\n').filter(row => row.trim() !== '');
+            const headers = rows[0].split(',').map(h => h.trim());
             const data = [];
-            for (let i = 1; i < lines.length; i++) {
-                if (lines[i].trim() === '') continue;
-                
-                const values = lines[i].split(',');
+        
+            for (let i = 1; i < rows.length; i++) {
+                const values = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Split on commas not inside quotes
                 const entry = {};
-                
                 headers.forEach((header, index) => {
-                    entry[header] = values[index] ? values[index].trim() : '';
+                    entry[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
                 });
-                
                 data.push(entry);
             }
-            
             return data;
         }
         
