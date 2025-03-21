@@ -609,23 +609,22 @@ function generateColorKey() {
 }
 
 
-        // Function to display the timeline
 function displayTimeline() {
     if (!eventData || eventData.length === 0) {
         showError('No event data to display.');
         return;
     }
-    
+
     // Sort events by start date
     eventData.sort((a, b) => {
         const dateA = parseDate(a.START_DATE);
         const dateB = parseDate(b.START_DATE);
         return dateA - dateB;
     });
-    
+
     // Clear the timeline
     timeline.innerHTML = '';
-    
+
     // Calculate timeline dimensions
     const containerWidth = timelineContainer.clientWidth - 40; // Adjust for padding
     const eventBoxWidth = Math.min(150, containerWidth * 0.2);
@@ -633,107 +632,82 @@ function displayTimeline() {
     const eventSpacing = 30;
     const rowHeight = eventBoxHeight + 60;
     const eventsPerRow = Math.max(3, Math.floor(containerWidth / (eventBoxWidth + eventSpacing)));
-    
+
     // Find the earliest and latest dates
     let earliestDate = new Date();
     let latestDate = new Date(0);
-    
+
     eventData.forEach(event => {
         const date = parseDate(event.START_DATE);
         if (date < earliestDate) earliestDate = date;
         if (date > latestDate) latestDate = date;
     });
-    
+
     // Calculate start and end years
     const startYear = earliestDate.getFullYear();
     const endYear = latestDate.getFullYear();
-    
+
     // Create year markers
     for (let year = startYear; year <= endYear; year++) {
         const yearPositions = calculateYearPosition(year, startYear, endYear, containerWidth, eventsPerRow, rowHeight);
-        
+
         yearPositions.forEach(pos => {
             const marker = document.createElement('div');
             marker.className = 'year-marker';
             marker.style.left = `${pos.x}px`;
             marker.style.top = `${pos.y - 15}px`;
             marker.style.height = '15px';
-            
+
             const label = document.createElement('div');
             label.className = 'year-label';
             label.style.left = `${pos.x - 15}px`;
             label.style.top = `${pos.y - 30}px`;
             label.textContent = year;
-            
+
             timeline.appendChild(marker);
             timeline.appendChild(label);
         });
     }
-    
-    // Create timeline path segments
+
+    // Create timeline path segments and connectors
     const rowCount = Math.ceil(eventData.length / eventsPerRow);
-    
+
     for (let row = 0; row < rowCount; row++) {
         const path = document.createElement('div');
         path.className = 'timeline-path';
-        
-        // Snake pattern - alternate left-to-right and right-to-left
-        if (row % 2 === 0) {
-            // Left to right
-            path.style.left = '0';
-            path.style.width = `${containerWidth}px`;
-        } else {
-            // Right to left
-            path.style.left = '0';
-            path.style.width = `${containerWidth}px`;
-        }
-        
         path.style.top = `${row * rowHeight + eventBoxHeight / 2}px`;
+        path.style.left = '0';
+        path.style.width = `${containerWidth}px`;
         timeline.appendChild(path);
-        
-        // Add vertical connectors between rows (except for the last row)
+
+        // Add vertical connector if not last row
         if (row < rowCount - 1) {
             const connector = document.createElement('div');
             connector.className = 'timeline-connector';
-            
-            // Position depends on whether we're connecting from right-to-left or left-to-right
-            if (row % 2 === 0) {
-                // Current row is left-to-right, connect from right to left
-                connector.style.left = `${containerWidth}px`;
-            } else {
-                // Current row is right-to-left, connect from left to right
-                connector.style.left = `0px`;
-            }
-            
-            // Set the vertical position and height to connect this row to the next
             connector.style.top = `${row * rowHeight + eventBoxHeight / 2}px`;
             connector.style.height = `${rowHeight}px`;
-            
+            connector.style.left = (row % 2 === 0) ? `${containerWidth}px` : '0px';
             timeline.appendChild(connector);
         }
     }
-    
-    // Calculate total timeline height and set it
-    const totalHeight = rowCount * rowHeight;
-    timeline.style.height = `${totalHeight}px`;
-    
+
     // Create event boxes
     eventData.forEach((event, index) => {
         const row = Math.floor(index / eventsPerRow);
         const colInRow = index % eventsPerRow;
-        
-        // Calculate position based on snake pattern
+
+        // Snake pattern position calculation
         let left;
         if (row % 2 === 0) {
             // Left to right
             left = colInRow * (containerWidth / eventsPerRow);
         } else {
             // Right to left
-            left = containerWidth - ((colInRow + 1) * (containerWidth / eventsPerRow)) + eventSpacing/2;
+            left = containerWidth - ((colInRow + 1) * (containerWidth / eventsPerRow)) + eventSpacing / 2;
         }
-        
+
         const top = row * rowHeight;
-        
+
         // Create the event box
         const eventBox = document.createElement('div');
         eventBox.className = 'event-box';
@@ -741,39 +715,45 @@ function displayTimeline() {
         eventBox.style.top = `${top}px`;
         eventBox.style.width = `${eventBoxWidth}px`;
         eventBox.style.height = `${eventBoxHeight}px`;
-        
-        // Set color based on type if enabled
+
+        // Set color based on TYPE if colorByType is enabled
         if (colorByType && event.TYPE) {
             eventBox.style.backgroundColor = getTypeColor(event.TYPE);
         }
-        
-        // Add event content
+
+        // Add date and title to event box
         const dateElem = document.createElement('div');
         dateElem.className = 'event-date';
         dateElem.textContent = formatDate(parseDate(event.START_DATE));
-        
+
         const titleElem = document.createElement('div');
         titleElem.className = 'event-title';
         titleElem.textContent = event.NAME || 'Unnamed Event';
-        
+
         eventBox.appendChild(dateElem);
         eventBox.appendChild(titleElem);
-        
-        // Add click event to show modal
+
+        // Add click event to show event details in modal
         eventBox.addEventListener('click', () => {
             showEventDetails(event);
         });
-        
+
+        // Add the event box to the timeline
         timeline.appendChild(eventBox);
     });
 
+    // ✅ Generate the color key ONCE, after all event boxes are drawn
     if (colorByType) {
-    generateColorKey();
-} else {
-    document.getElementById('color-key-container').style.display = 'none';
+        generateColorKey();
+    } else {
+        document.getElementById('color-key-container').style.display = 'none';
+    }
+
+    // Set timeline height
+    const totalHeight = rowCount * rowHeight;
+    timeline.style.height = `${totalHeight}px`;
 }
 
-}
         
         // Calculate where a year should appear on the snake timeline
         function calculateYearPosition(year, startYear, endYear, width, eventsPerRow, rowHeight) {
