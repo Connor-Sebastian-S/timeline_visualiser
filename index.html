@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeline Visualizer</title>
+    <title>Timeline</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -178,6 +178,33 @@
     background-color: var(--primary-color);
     z-index: 1;
 }
+
+        #color-key-container {
+    padding: 10px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+#color-key-container h3 {
+    margin-bottom: 10px;
+}
+
+#color-key li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#color-key li span:first-child {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 
         .year-marker {
             position: absolute;
@@ -374,12 +401,17 @@
 
     <div class="controls">
         <div class="toggle-container">
-            <span>Color by Type:</span>
+            <span>Colour by Type:</span>
             <label class="toggle-switch">
                 <input type="checkbox" id="color-toggle" checked>
                 <span class="toggle-slider"></span>
             </label>
         </div>
+        <div id="color-key-container" style="display: none;">
+            <h3>Event Type Colour Key</h3>
+            <ul id="color-key" style="list-style: none; padding: 0;"></ul>
+        </div>
+        <div id="color-key-container" style="margin: 10px 0;"></div>
     </div>
 
     <div id="timeline-container">
@@ -529,7 +561,53 @@
             
             return `hsl(${h}, ${s}%, ${l}%)`;
         }
+
+function generateColorKey() {
+    const colorKeyContainer = document.getElementById('color-key-container');
+    const colorKeyList = document.getElementById('color-key');
+
+    // Clear any existing key
+    colorKeyList.innerHTML = '';
+
+    // Collect unique event types
+    const uniqueTypes = [...new Set(eventData.map(event => event.TYPE).filter(type => type))];
+
+    // If there are no types, hide the key
+    if (uniqueTypes.length === 0) {
+        colorKeyContainer.style.display = 'none';
+        return;
+    }
+
+    // Otherwise, show the key and populate it
+    colorKeyContainer.style.display = 'block';
+
+    uniqueTypes.forEach(type => {
+        const color = getTypeColor(type);
         
+        const listItem = document.createElement('li');
+        listItem.style.display = 'flex';
+        listItem.style.alignItems = 'center';
+        listItem.style.marginBottom = '5px';
+
+        const colorBox = document.createElement('span');
+        colorBox.style.display = 'inline-block';
+        colorBox.style.width = '20px';
+        colorBox.style.height = '20px';
+        colorBox.style.backgroundColor = color;
+        colorBox.style.border = '1px solid #ccc';
+        colorBox.style.marginRight = '10px';
+        colorBox.style.borderRadius = '4px';
+
+        const label = document.createElement('span');
+        label.textContent = type;
+
+        listItem.appendChild(colorBox);
+        listItem.appendChild(label);
+
+        colorKeyList.appendChild(listItem);
+    });
+}
+
         // Function to display the timeline
 function displayTimeline() {
     if (!eventData || eventData.length === 0) {
@@ -667,6 +745,12 @@ function displayTimeline() {
         if (colorByType && event.TYPE) {
             eventBox.style.backgroundColor = getTypeColor(event.TYPE);
         }
+        if (colorByType) {
+            generateColorKey();
+        } else {
+            document.getElementById('color-key-container').style.display = 'none';
+        }
+
         
         // Add event content
         const dateElem = document.createElement('div');
