@@ -323,18 +323,18 @@
         }
 
         .fullscreen-image {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    display: none;  /* ✅ Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+            cursor: pointer;
+}
 
         .fullscreen-image img {
             max-width: 90%;
