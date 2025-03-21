@@ -379,8 +379,8 @@
 </head>
 <body>
     <header>
-        <h1>Timeline Visualizer</h1>
-        <p>Upload your CSV and optional ZIP file to visualize events on a timeline.</p>
+        <h1>Timeline</h1>
+        <p>Upload your CSV and optional ZIP file to visualise events on a timeline.</p>
     </header>
 
     <div class="upload-container">
@@ -583,7 +583,7 @@ function generateColorKey() {
     colorKeyContainer.style.display = 'block';
 
     uniqueTypes.forEach(type => {
-        const color = getTypeColor(type);
+        const color = getTypeColor(TYPE);
 
         const item = document.createElement('div');
         item.style.display = 'flex';
