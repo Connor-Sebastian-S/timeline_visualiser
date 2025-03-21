@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- Include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- Optional Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -400,6 +405,82 @@
     </style>
 </head>
 <body>
+    <div class="documentation-container" style="max-width: 800px; margin: 2rem auto; padding: 20px; background: #f8f9fa; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h2 style="color: #166088; border-bottom: 2px solid #4a6fa5; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">How to Prepare Your Timeline Files</h2>
+
+    <div class="file-requirements">
+        <!-- CSV Section -->
+        <div class="csv-section" style="margin-bottom: 2rem;">
+            <h3 style="color: #4a6fa5; margin-bottom: 1rem;">
+                <i class="fas fa-file-csv" style="margin-right: 0.5rem;"></i>
+                CSV File Requirements
+            </h3>
+            <div class="table-responsive" style="background: white; border-radius: 8px; padding: 1rem;">
+                <table class="table table-sm" style="margin-bottom: 0;">
+                    <thead style="background: #e9ecef;">
+                        <tr>
+                            <th>Column Name</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                            <th>Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>ID</td><td>Unique numeric identifier</td><td>1, 2, 3</td><td><span class="badge bg-danger">Required</span></td></tr>
+                        <tr><td>START_DATE</td><td>Start date (DD-MM-YYYY)</td><td>10-09-1396</td><td><span class="badge bg-danger">Required</span></td></tr>
+                        <tr><td>END_DATE</td><td>End date</td><td>10-09-1396</td><td><span class="badge bg-success">Optional</span></td></tr>
+                        <tr><td>NAME</td><td>Short event title</td><td>Battle of the North Inch</td><td><span class="badge bg-danger">Required</span></td></tr>
+                        <tr><td>DESCRIPTION</td><td>Detailed description</td><td>30vs30 judicial combat...</td><td><span class="badge bg-success">Optional</span></td></tr>
+                        <tr><td>TYPE</td><td>Category for coloring</td><td>Military, Political</td><td><span class="badge bg-success">Optional</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ZIP Section -->
+        <div class="zip-section" style="margin-bottom: 2rem;">
+            <h3 style="color: #4a6fa5; margin-bottom: 1rem;">
+                <i class="fas fa-file-archive" style="margin-right: 0.5rem;"></i>
+                ZIP File Structure
+            </h3>
+            <div style="background: #ffffff; border-radius: 8px; padding: 1rem; font-family: monospace;">
+                <div>your-data.zip/</div>
+                <div style="margin-left: 1rem;">
+                    <div>├── 1/</div>
+                    <div style="margin-left: 1rem;">
+                        <div>│   ├── image1.jpg</div>
+                        <div>│   ├── audio.mp3</div>
+                        <div>│   └── videos.txt</div>
+                    </div>
+                    <div>├── 5/</div>
+                    <div style="margin-left: 1rem;">│   └── battle.jpg</div>
+                    <div>└── 17/</div>
+                </div>
+            </div>
+            <div class="mt-3" style="margin-top: 1rem;">
+                <strong>videos.txt format:</strong>
+                <pre style="background: white; padding: 1rem; border-radius: 6px;">https://youtu.be/example1
+https://vimeo.com/example2</pre>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="usage-tips" style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px;">
+            <h4 style="color: #166088; margin-bottom: 1rem;">
+                <i class="fas fa-lightbulb" style="margin-right: 0.5rem;"></i>
+                Usage Tips
+            </h4>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 0.5rem;"><i class="fas fa-check text-success"></i> Folders only needed for events with media</li>
+                <li style="margin-bottom: 0.5rem;"><i class="fas fa-check text-success"></i> Keep filenames simple (avoid spaces)</li>
+                <li style="margin-bottom: 0.5rem;"><i class="fas fa-check text-success"></i> Test video URLs before including</li>
+                <li style="margin-bottom: 0.5rem;"><i class="fas fa-times text-danger"></i> Max image size: 500KB</li>
+                <li style="margin-bottom: 0.5rem;"><i class="fas fa-times text-danger"></i> Max audio size: 2MB</li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
     <header>
         <h1>Timeline</h1>
         <p>Upload your CSV and optional ZIP file to visualise events on a timeline.</p>
