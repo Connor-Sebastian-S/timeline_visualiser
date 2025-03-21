@@ -746,12 +746,6 @@ function displayTimeline() {
         if (colorByType && event.TYPE) {
             eventBox.style.backgroundColor = getTypeColor(event.TYPE);
         }
-        if (colorByType) {
-            generateColorKey();
-        } else {
-            document.getElementById('color-key-container').style.display = 'none';
-        }
-
         
         // Add event content
         const dateElem = document.createElement('div');
@@ -772,6 +766,13 @@ function displayTimeline() {
         
         timeline.appendChild(eventBox);
     });
+
+    if (colorByType) {
+    generateColorKey();
+} else {
+    document.getElementById('color-key-container').style.display = 'none';
+}
+
 }
         
         // Calculate where a year should appear on the snake timeline
