@@ -404,7 +404,7 @@
         const csvFileInput = document.getElementById('csv-file');
         const zipFileInput = document.getElementById('zip-file');
         const loadButton = document.getElementById('load-button');
-        const loadDefaultButton = document.getElementById('load-default-button');
+        const Button = document.getElementById('load-default-button');
         const colorToggle = document.getElementById('color-toggle');
         const timelineContainer = document.getElementById('timeline-container');
         const timeline = document.getElementById('timeline');
@@ -824,35 +824,59 @@
         });
         
         // Load default data button click event
-        loadDefaultButton.addEventListener('click', async () => {
-            clearError();
-            loading.style.display = 'block';
-            
-            try {
-                // Load JSZip dynamically if needed
-                if (!window.JSZip) {
-                    await loadJSZip();
-                }
-                
-                // Load default CSV data
-                const csvResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/timeline.csv');
-                const csvText = await csvResponse.text();
-                eventData = parseCSV(csvText);
-                
-                // Load default ZIP file
-                const zipResponse = await fetch('https://github.com/Connor-Sebastian-S/timeline_visualiser/raw/main/default.zip');
-                const zipBlob = await zipResponse.blob();
-                imageData = await handleZipFile(zipBlob);
-                
-                // Display the timeline
-                displayTimeline();
-            } catch (error) {
-                console.error('Error loading default data:', error);
-                showError('Error loading default data: ' + error.message);
-            } finally {
-                loading.style.display = 'none';
+loadDefaultButton.addEventListener('click', async () => {
+    clearError();
+    loading.style.display = 'block';
+    
+    try {
+        // Load JSZip dynamically if needed
+        if (!window.JSZip) {
+            await loadJSZip();
+        }
+        
+        // Load default CSV data with proper error handling
+        try {
+            const csvResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/timeline.csv');
+            if (!csvResponse.ok) {
+                throw new Error(`Failed to fetch CSV: ${csvResponse.status} ${csvResponse.statusText}`);
             }
-        });
+            const csvText = await csvResponse.text();
+            eventData = parseCSV(csvText);
+        } catch (csvError) {
+            console.error('Error loading default CSV:', csvError);
+            showError('Error loading default CSV. Using empty dataset.');
+            eventData = [];
+        }
+        
+        // Reset image data if there's an error with the ZIP
+        imageData = {};
+        
+        // Load default ZIP file with proper error handling
+        try {
+            const zipResponse = await fetch('https://github.com/Connor-Sebastian-S/timeline_visualiser/raw/main/default.zip');
+            if (!zipResponse.ok) {
+                throw new Error(`Failed to fetch ZIP: ${zipResponse.status} ${zipResponse.statusText}`);
+            }
+            const zipBlob = await zipResponse.blob();
+            imageData = await handleZipFile(zipBlob);
+        } catch (zipError) {
+            console.error('Error loading default ZIP:', zipError);
+            showError('Error loading default images. Timeline will display without images.');
+        }
+        
+        // Display the timeline even if only one of the files loaded successfully
+        if (eventData.length > 0) {
+            displayTimeline();
+        } else {
+            showError('No events to display. Please check the CSV file format.');
+        }
+    } catch (error) {
+        console.error('Error in default data loading process:', error);
+        showError('Error loading default data: ' + error.message);
+    } finally {
+        loading.style.display = 'none';
+    }
+});
         
         // Function to load JSZip library dynamically
         async function loadJSZip() {
