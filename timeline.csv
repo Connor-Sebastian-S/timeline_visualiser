@@ -1,4 +1,4 @@
-ID,START_DATE,END_DATE,EVENT,DESCRIPTION,TYPE
+ID,START_DATE,END_DATE,NAME,DESCRIPTION,TYPE
 1,28-06-1914,28-06-1914,Assassination of Archduke Franz Ferdinand,"Archduke Franz Ferdinand of Austria and his wife Sophie are assassinated by Serbian nationalist Gavrilo Princip in Sarajevo, Bosnia. This event is widely considered the immediate trigger of World War I.",Political
 2,28-07-1914,28-07-1914,Austria-Hungary Declares War on Serbia,"After issuing an ultimatum that was only partially accepted, Austria-Hungary declares war on Serbia, officially beginning World War I.",Military
 3,01-08-1914,03-08-1914,Germany Declares War,"Germany declares war on Russia (August 1) and France (August 3), implementing the Schlieffen Plan for a two-front war.",Military
