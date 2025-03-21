@@ -981,9 +981,9 @@ function displayTimeline() {
             imgElement.addEventListener('click', () => showFullscreenImage(img.data));
             imageGallery.appendChild(imgElement);
         });
-    } else {
-        imageGallery.innerHTML = '<p>No images available.</p>';
-    }
+    } //else {
+     //   imageGallery.innerHTML = '<p>No images available.</p>';
+    //}
 
     // Add audio players
     if (media.audio.length > 0) {
@@ -1002,9 +1002,7 @@ function displayTimeline() {
         });
         
         imageGallery.after(audioSection);
-    } else {
-        audioSection.innerHTML = '<p>No audio available.</p>';
-    }
+    } 
 
     // Add video embeds
     if (media.videos.length > 0) {
@@ -1050,9 +1048,7 @@ function displayTimeline() {
         });
         
         imageGallery.after(videoSection);
-    } else {
-        videoSection.innerHTML = '<p>No video available.</p>';
-    }
+    } 
 
     modal.style.display = 'block';
 }
