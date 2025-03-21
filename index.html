@@ -957,6 +957,16 @@ function displayTimeline() {
 
     // Clear previous media
     imageGallery.innerHTML = '';
+
+    document.querySelectorAll('.media-section').forEach(section => {
+        section.remove();
+    });
+            
+    document.querySelectorAll('audio, video').forEach(mediaElement => {
+        mediaElement.pause();
+        mediaElement.removeAttribute('src');
+        mediaElement.load();
+    });
     
     const eventId = String(event.ID);
     const media = imageData[eventId] || { images: [], audio: [], videos: [] };
@@ -978,7 +988,7 @@ function displayTimeline() {
     // Add audio players
     if (media.audio.length > 0) {
         const audioSection = document.createElement('div');
-        audioSection.className = 'media-section';
+        audioSection.className = 'media-section audio-section'; // Added specific class
         audioSection.innerHTML = '<h4>Audio Clips</h4>';
         
         media.audio.forEach(audio => {
@@ -996,8 +1006,9 @@ function displayTimeline() {
 
     // Add video embeds
     if (media.videos.length > 0) {
+        
         const videoSection = document.createElement('div');
-        videoSection.className = 'media-section';
+        videoSection.className = 'media-section video-section'; // Added specific class
         videoSection.innerHTML = '<h4>Videos</h4>';
         
         media.videos.forEach(url => {
