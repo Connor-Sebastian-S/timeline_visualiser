@@ -574,7 +574,10 @@ https://vimeo.com/example2</pre>
                 const values = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Split on commas not inside quotes
                 const entry = {};
                 headers.forEach((header, index) => {
-                    entry[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
+                    // Preserve ID as string
+                    entry[header] = header === 'ID' 
+                        ? values[index]?.trim().replace(/^"|"$/g, '') 
+                        : values[index]?.trim().replace(/^"|"$/g, '');
                 });
                 data.push(entry);
             }
@@ -955,7 +958,7 @@ function displayTimeline() {
     // Clear previous media
     imageGallery.innerHTML = '';
     
-    const eventId = event.ID;
+    const eventId = String(event.ID);
     const media = imageData[eventId] || { images: [], audio: [], videos: [] };
 
     // Show images
