@@ -187,6 +187,23 @@
             transform: translateX(-50%);
             z-index: 0;
         }
+        .timeline-line {
+    display: none;
+}
+
+        .timeline-connector {
+            width: 4px;
+            height: 40px;
+            background-color: var(--primary-color);
+            margin: 0 auto;
+        }
+        
+        .timeline-row {
+            display: flex;
+            position: relative;
+            margin-bottom: 20px;
+            justify-content: space-around;
+        }
         
         .year-marker {
             position: absolute;
@@ -200,19 +217,19 @@
             z-index: 2;
         }
         
-        .event-box {
-            flex: 1;
-            margin: 10px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--box-shadow);
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            z-index: 1;
-            max-width: calc(100% / var(--items-per-row) - 20px);
-        }
+.event-box {
+    flex: 0 1 calc(100% / var(--items-per-row) - 20px);
+    margin: 10px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+    min-width: 200px;
+}
         
         .event-box:hover {
             transform: translateY(-5px);
@@ -686,113 +703,222 @@
             }
             
             // Create timeline visualization
-            function createTimeline() {
-                // Clear previous timeline
-                timelineContainer.innerHTML = '';
-                
-                // Sort events by start date
-                timelineData.sort((a, b) => {
-                    const dateA = parseDate(a.START_DATE);
-                    const dateB = parseDate(b.START_DATE);
-                    return dateA - dateB;
-                });
-                
-                // Get all unique years for markers
-                const years = new Set();
-                timelineData.forEach(event => {
-                    const date = parseDate(event.START_DATE);
-                    years.add(date.getFullYear());
-                });
-                
-                // Create color mapping for event types
-                uniqueTypes = new Set(timelineData.map(event => event.TYPE));
-                uniqueTypes.forEach(type => {
-                    if (!typeColors[type]) {
-                        typeColors[type] = stringToColor(type);
-                    }
-                });
-                
-                // Determine items per row (responsive)
-                let itemsPerRow = parseInt(itemsPerRowSelect.value);
-                if (window.innerWidth <= 768) {
-                    itemsPerRow = 1;
-                }
-                
-                // Set CSS variable for items per row
-                document.documentElement.style.setProperty('--items-per-row', itemsPerRow);
-                
-                // Create rows of events
-                let currentRow;
-                let eventCount = 0;
-                let rowCount = 0;
-                
-                timelineData.forEach((event, index) => {
-                    // Create a new row when needed
-                    if (eventCount % itemsPerRow === 0) {
-                        currentRow = document.createElement('div');
-                        currentRow.className = 'timeline-row';
-                        timelineContainer.appendChild(currentRow);
-                        rowCount++;
-                        
-                        // Add a line connecting rows
-                        if (rowCount > 1) {
-                            const connector = document.createElement('div');
-                            connector.className = 'timeline-line';
-                            timelineContainer.appendChild(connector);
-                        }
-                    }
-                    
-                    // Create event box
-                    const eventBox = document.createElement('div');
-                    eventBox.className = 'event-box';
-                    eventBox.dataset.id = event.ID;
-                    
-                    // Apply color based on type if enabled
-                    if (colorToggle.checked) {
-                        eventBox.style.borderLeft = `5px solid ${typeColors[event.TYPE]}`;
-                    }
-                    
-                    // Add event info
-                    const eventDate = document.createElement('div');
-                    eventDate.className = 'event-date';
-                    eventDate.textContent = event.START_DATE;
-                    
-                    const eventName = document.createElement('div');
-                    eventName.className = 'event-name';
-                    eventName.textContent = event.NAME;
-                    
-                    eventBox.appendChild(eventDate);
-                    eventBox.appendChild(eventName);
-                    
-                    // Add event box to current row
-                    currentRow.appendChild(eventBox);
-                    
-                    // Add click handler to show modal
-                    eventBox.addEventListener('click', () => showEventDetails(event));
-                    
-                    eventCount++;
-                    
-                    // Add year markers
-                    const date = parseDate(event.START_DATE);
-                    const year = date.getFullYear();
-                    
-                    if (years.has(year)) {
-                        // Only add the marker once
-                        years.delete(year);
-                        
-                        // Calculate position based on the event's position
-                        const yearMarker = document.createElement('div');
-                        yearMarker.className = 'year-marker';
-                        yearMarker.textContent = year;
-                        
-                        // Position the marker at the appropriate row
-                        const rowIndex = Math.floor(index / itemsPerRow);
-                        yearMarker.style.top = `${rowIndex * 120}px`;
-                        
-                        timelineContainer.appendChild(yearMarker);
-                    }
-                });
+function createTimeline() {
+    // Clear previous timeline
+    timelineContainer.innerHTML = '';
+    
+    // Sort events by start date
+    timelineData.sort((a, b) => {
+        const dateA = parseDate(a.START_DATE);
+        const dateB = parseDate(b.START_DATE);
+        return dateA - dateB;
+    });
+    
+    // Get all unique years for markers
+    const years = new Set();
+    timelineData.forEach(event => {
+        const date = parseDate(event.START_DATE);
+        years.add(date.getFullYear());
+    });
+    
+    // Create color mapping for event types
+    uniqueTypes = new Set(timelineData.map(event => event.TYPE));
+    uniqueTypes.forEach(type => {
+        if (!typeColors[type]) {
+            typeColors[type] = stringToColor(type);
+        }
+    });
+    
+    // Determine items per row (responsive)
+    let itemsPerRow = parseInt(itemsPerRowSelect.value);
+    if (window.innerWidth <= 768) {
+        itemsPerRow = 1;
+    }
+    
+    // Set CSS variable for items per row
+    document.documentElement.style.setProperty('--items-per-row', itemsPerRow);
+    
+    // Group events into rows
+    const rows = [];
+    for (let i = 0; i < timelineData.length; i += itemsPerRow) {
+        rows.push(timelineData.slice(i, i + itemsPerRow));
+    }
+    
+    // Create snake pattern timeline
+    rows.forEach((rowEvents, rowIndex) => {
+        // Create row
+        const row = document.createElement('div');
+        row.className = 'timeline-row';
+        
+        // Set direction based on row index (even rows: left-to-right, odd rows: right-to-left)
+        const isReversed = rowIndex % 2 === 1;
+        row.style.flexDirection = isReversed ? 'row-reverse' : 'row';
+        
+        // Add events to row
+        const events = isReversed ? [...rowEvents].reverse() : rowEvents;
+        
+        events.forEach(event => {
+            // Create event box
+            const eventBox = document.createElement('div');
+            eventBox.className = 'event-box';
+            eventBox.dataset.id = event.ID;
+            
+            // Apply color based on type if enabled
+            if (colorToggle.checked) {
+                eventBox.style.borderLeft = `5px solid ${typeColors[event.TYPE]}`;
             }
+            
+            // Add event info
+            const eventDate = document.createElement('div');
+            eventDate.className = 'event-date';
+            eventDate.textContent = event.START_DATE;
+            
+            const eventName = document.createElement('div');
+            eventName.className = 'event-name';
+            eventName.textContent = event.NAME;
+            
+            eventBox.appendChild(eventDate);
+            eventBox.appendChild(eventName);
+            
+            // Add event box to row
+            row.appendChild(eventBox);
+            
+            // Add click handler to show modal
+            eventBox.addEventListener('click', () => showEventDetails(event));
+        });
+        
+        // Add row to timeline
+        timelineContainer.appendChild(row);
+        
+        // Add vertical connector after each row (except the last one)
+        if (rowIndex < rows.length - 1) {
+            const connector = document.createElement('div');
+            connector.className = 'timeline-connector';
+            timelineContainer.appendChild(connector);
+        }
+        
+        // Add year markers
+        rowEvents.forEach(event => {
+            const date = parseDate(event.START_DATE);
+            const year = date.getFullYear();
+            
+            if (years.has(year)) {
+                // Only add the marker once
+                years.delete(year);
+                
+                // Create year marker
+                const yearMarker = document.createElement('div');
+                yearMarker.className = 'year-marker';
+                yearMarker.textContent = year;
+                
+                // Position the marker relative to the row
+                yearMarker.style.top = `${rowIndex * 120 + 60}px`;
+                
+                timelineContainer.appendChild(yearMarker);
+            }
+        });
+    });
+    
+    // Add snake pattern connector lines
+    createSnakeConnector();
+}
+
+// Create snake pattern connector
+function createSnakeConnector() {
+    // Get all rows
+    const rows = document.querySelectorAll('.timeline-row');
+    if (rows.length <= 1) return;
+    
+    // Create SVG element for the snake connector
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'snake-connector');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+    svg.style.zIndex = '-1';
+    svg.style.pointerEvents = 'none';
+    
+    // Create path for the snake connector
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('stroke', 'var(--primary-color)');
+    path.setAttribute('stroke-width', '4');
+    path.setAttribute('fill', 'none');
+    
+    // Build the path
+    let pathData = '';
+    
+    rows.forEach((row, index) => {
+        const events = row.querySelectorAll('.event-box');
+        const isReversed = index % 2 === 1;
+        
+        // Skip if no events in row
+        if (events.length === 0) return;
+        
+        // First row, start path
+        if (index === 0) {
+            const firstEvent = events[0];
+            const rect = firstEvent.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            pathData = `M ${x} ${y}`;
+        }
+        
+        // Add horizontal line through all events in row
+        const firstEvent = isReversed ? events[events.length - 1] : events[0];
+        const lastEvent = isReversed ? events[0] : events[events.length - 1];
+        
+        const firstRect = firstEvent.getBoundingClientRect();
+        const lastRect = lastEvent.getBoundingClientRect();
+        
+        const startX = firstRect.left + firstRect.width / 2;
+        const startY = firstRect.top + firstRect.height / 2;
+        const endX = lastRect.left + lastRect.width / 2;
+        const endY = lastRect.top + lastRect.height / 2;
+        
+        pathData += ` L ${endX} ${endY}`;
+        
+        // Add vertical connector to next row if not the last row
+        if (index < rows.length - 1) {
+            const nextRow = rows[index + 1];
+            const nextEvents = nextRow.querySelectorAll('.event-box');
+            
+            if (nextEvents.length > 0) {
+                const nextIsReversed = (index + 1) % 2 === 1;
+                const nextEvent = nextIsReversed ? nextEvents[nextEvents.length - 1] : nextEvents[0];
+                const nextRect = nextEvent.getBoundingClientRect();
+                
+                const nextX = nextRect.left + nextRect.width / 2;
+                const nextY = nextRect.top + nextRect.height / 2;
+                
+                pathData += ` L ${nextX} ${nextY}`;
+            }
+        }
+    });
+    
+    path.setAttribute('d', pathData);
+    svg.appendChild(path);
+    timelineContainer.appendChild(svg);
+    
+    // Adjust SVG viewBox based on container size
+    const containerRect = timelineContainer.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${containerRect.width} ${containerRect.height}`);
+    svg.setAttribute('width', containerRect.width);
+    svg.setAttribute('height', containerRect.height);
+}
+
+// Update connector on window resize
+window.addEventListener('resize', function() {
+    // Remove existing connector
+    const existingConnector = document.querySelector('.snake-connector');
+    if (existingConnector) {
+        existingConnector.remove();
+    }
+    
+    // Redraw connector
+    createSnakeConnector();
+});
             
             // Show event details in modal
             function showEventDetails(event) {
