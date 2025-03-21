@@ -407,11 +407,11 @@
                 <span class="toggle-slider"></span>
             </label>
         </div>
-        <div id="color-key-container" style="display: none;">
-            <h3>Event Type Colour Key</h3>
-            <ul id="color-key" style="list-style: none; padding: 0;"></ul>
+        <div id="color-key-container" style="display: none; margin-top: 10px;">
+            <h3>Type Legend</h3>
+            <div id="color-key" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
         </div>
-        <div id="color-key-container" style="margin: 10px 0;"></div>
+
     </div>
 
     <div id="timeline-container">
@@ -564,49 +564,48 @@
 
 function generateColorKey() {
     const colorKeyContainer = document.getElementById('color-key-container');
-    const colorKeyList = document.getElementById('color-key');
+    const colorKey = document.getElementById('color-key');
 
-    // Clear any existing key
-    colorKeyList.innerHTML = '';
+    // Clear any previous keys
+    colorKey.innerHTML = '';
 
-    // Collect unique event types
-    const uniqueTypes = [...new Set(eventData.map(event => event.TYPE).filter(type => type))];
+    // Extract unique TYPE values from eventData
+    const uniqueTypes = [...new Set(eventData.map(event => event.TYPE).filter(type => type !== ''))];
 
-    // If there are no types, hide the key
-    if (uniqueTypes.length === 0) {
+    // If there are no types, hide the legend
+    if (uniqueTypes.length === 0 || !colorByType) {
         colorKeyContainer.style.display = 'none';
         return;
     }
 
-    // Otherwise, show the key and populate it
+    // Otherwise, show the container
     colorKeyContainer.style.display = 'block';
 
     uniqueTypes.forEach(type => {
         const color = getTypeColor(type);
-        
-        const listItem = document.createElement('li');
-        listItem.style.display = 'flex';
-        listItem.style.alignItems = 'center';
-        listItem.style.marginBottom = '5px';
 
-        const colorBox = document.createElement('span');
-        colorBox.style.display = 'inline-block';
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.gap = '8px';
+
+        const colorBox = document.createElement('div');
         colorBox.style.width = '20px';
         colorBox.style.height = '20px';
         colorBox.style.backgroundColor = color;
-        colorBox.style.border = '1px solid #ccc';
-        colorBox.style.marginRight = '10px';
+        colorBox.style.border = '1px solid #aaa';
         colorBox.style.borderRadius = '4px';
 
         const label = document.createElement('span');
         label.textContent = type;
 
-        listItem.appendChild(colorBox);
-        //listItem.appendChild(label);
+        item.appendChild(colorBox);
+        item.appendChild(label);
 
-        colorKeyList.appendChild(listItem);
+        colorKey.appendChild(item);
     });
 }
+
 
         // Function to display the timeline
 function displayTimeline() {
