@@ -883,7 +883,7 @@ loadDefaultButton.addEventListener('click', async () => {
         
         // Load default ZIP file with proper error handling
         try {
-            const zipResponse = await fetch('https://github.com/Connor-Sebastian-S/timeline_visualiser/raw/main/default.zip');
+            const zipResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/default.zip');
             if (!zipResponse.ok) {
                 throw new Error(`Failed to fetch ZIP: ${zipResponse.status} ${zipResponse.statusText}`);
             }
