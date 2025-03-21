@@ -356,6 +356,28 @@
             margin-bottom: 15px;
         }
 
+        .media-section {
+    margin: 20px 0;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.video-wrapper {
+    margin: 10px 0;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+}
+
+.video-wrapper iframe,
+.video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -478,65 +500,97 @@
             return data;
         }
         
-        // Function to parse ZIP file
         async function handleZipFile(file) {
-            try {
-                const JSZip = window.JSZip;
-                if (!JSZip) {
-                    throw new Error("JSZip library not loaded");
-                }
-                
-                const zip = await JSZip.loadAsync(file);
-                const imageData = {};
-                
-                // Process each folder in the zip file
-                const processingPromises = [];
-                
-                zip.forEach((path, zipEntry) => {
-                    if (!zipEntry.dir) {
-                        const pathParts = path.split('/');
-                        // Check if it's in a directory (ID folder)
-                        if (pathParts.length > 1) {
-                            const folderId = pathParts[0];
-                            const fileName = pathParts[pathParts.length - 1];
-                            
-                            // Check if it's an image file
-                            if (/\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName)) {
-                                if (!imageData[folderId]) {
-                                    imageData[folderId] = [];
-                                }
-                                
-                                const promise = zipEntry.async('base64').then(content => {
-                                    const fileExt = fileName.split('.').pop().toLowerCase();
-                                    const mimeType = {
-                                        'jpg': 'image/jpeg',
-                                        'jpeg': 'image/jpeg',
-                                        'png': 'image/png',
-                                        'gif': 'image/gif',
-                                        'bmp': 'image/bmp',
-                                        'webp': 'image/webp'
-                                    }[fileExt] || 'image/jpeg';
-                                    
-                                    imageData[folderId].push({
-                                        name: fileName,
-                                        data: `data:${mimeType};base64,${content}`
-                                    });
-                                });
-                                
-                                processingPromises.push(promise);
-                            }
-                        }
+    try {
+        const JSZip = window.JSZip;
+        if (!JSZip) throw new Error("JSZip library not loaded");
+
+        const zip = await JSZip.loadAsync(file);
+        const mediaData = {};
+
+        const processingPromises = [];
+
+        zip.forEach((path, zipEntry) => {
+            if (!zipEntry.dir) {
+                const pathParts = path.split('/');
+                if (pathParts.length > 1) {
+                    const folderId = pathParts[0];
+                    const fileName = pathParts[pathParts.length - 1];
+
+                    // Create media entry if not exists
+                    if (!mediaData[folderId]) {
+                        mediaData[folderId] = {
+                            images: [],
+                            audio: [],
+                            videos: []
+                        };
                     }
-                });
-                
-                await Promise.all(processingPromises);
-                return imageData;
-            } catch (error) {
-                console.error('Error processing ZIP file:', error);
-                showError('Error processing ZIP file: ' + error.message);
-                return {};
+
+                    // Process images
+                    if (/\.(jpe?g|png|gif|bmp|webp)$/i.test(fileName)) {
+                        processingPromises.push(processImage(zipEntry, folderId, fileName, mediaData));
+                    }
+                    // Process audio files
+                    else if (/\.(mp3|wav|ogg)$/i.test(fileName)) {
+                        processingPromises.push(processAudio(zipEntry, folderId, fileName, mediaData));
+                    }
+                    // Process video links file
+                    else if (fileName.toLowerCase() === 'videos.txt') {
+                        processingPromises.push(processVideos(zipEntry, folderId, mediaData));
+                    }
+                }
             }
+        });
+
+        await Promise.all(processingPromises);
+        return mediaData;
+
+        async function processImage(zipEntry, folderId, fileName, mediaData) {
+            const content = await zipEntry.async('base64');
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            const mimeType = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'png': 'image/png',
+                'gif': 'image/gif',
+                'bmp': 'image/bmp',
+                'webp': 'image/webp'
+            }[fileExt] || 'image/jpeg';
+
+            mediaData[folderId].images.push({
+                name: fileName,
+                data: `data:${mimeType};base64,${content}`
+            });
         }
+
+        async function processAudio(zipEntry, folderId, fileName, mediaData) {
+            const content = await zipEntry.async('base64');
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            const mimeType = {
+                'mp3': 'audio/mpeg',
+                'wav': 'audio/wav',
+                'ogg': 'audio/ogg'
+            }[fileExt] || 'audio/mpeg';
+
+            mediaData[folderId].audio.push({
+                name: fileName,
+                data: `data:${mimeType};base64,${content}`
+            });
+        }
+
+        async function processVideos(zipEntry, folderId, mediaData) {
+            const content = await zipEntry.async('text');
+            mediaData[folderId].videos = content.split('\n')
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
+        }
+
+    } catch (error) {
+        console.error('Error processing ZIP file:', error);
+        showError('Error processing ZIP file: ' + error.message);
+        return {};
+    }
+}
         
         // Function to generate a color based on the event type
         function getTypeColor(type) {
@@ -812,37 +866,97 @@ function displayTimeline() {
             errorContainer.innerHTML = '';
         }
         
-        // Function to show event details in a modal
         function showEventDetails(event) {
-            modalTitle.textContent = event.NAME || 'Unnamed Event';
-            modalDate.textContent = `${event.START_DATE || 'No date'}`;
-            modalDescription.textContent = event.DESCRIPTION || 'No description available.';
+    modalTitle.textContent = event.NAME || 'Unnamed Event';
+    modalDate.textContent = event.START_DATE || 'No date';
+    modalDescription.textContent = event.DESCRIPTION || 'No description available.';
+
+    // Clear previous media
+    imageGallery.innerHTML = '';
+    
+    const eventId = event.ID;
+    const media = imageData[eventId] || { images: [], audio: [], videos: [] };
+
+    // Show images
+    if (media.images.length > 0) {
+        media.images.forEach(img => {
+            const imgElement = document.createElement('img');
+            imgElement.className = 'gallery-image';
+            imgElement.src = img.data;
+            imgElement.alt = img.name;
+            imgElement.addEventListener('click', () => showFullscreenImage(img.data));
+            imageGallery.appendChild(imgElement);
+        });
+    } else {
+        imageGallery.innerHTML = '<p>No images available.</p>';
+    }
+
+    // Add audio players
+    if (media.audio.length > 0) {
+        const audioSection = document.createElement('div');
+        audioSection.className = 'media-section';
+        audioSection.innerHTML = '<h4>Audio Clips</h4>';
+        
+        media.audio.forEach(audio => {
+            const audioElement = document.createElement('audio');
+            audioElement.controls = true;
+            audioElement.innerHTML = `
+                <source src="${audio.data}" type="${audio.data.split(';')[0].split(':')[1]}">
+                Your browser does not support audio elements.
+            `;
+            audioSection.appendChild(audioElement);
+        });
+        
+        imageGallery.after(audioSection);
+    }
+
+    // Add video embeds
+    if (media.videos.length > 0) {
+        const videoSection = document.createElement('div');
+        videoSection.className = 'media-section';
+        videoSection.innerHTML = '<h4>Videos</h4>';
+        
+        media.videos.forEach(url => {
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'video-wrapper';
             
-            // Clear previous images
-            imageGallery.innerHTML = '';
-            
-            // Add images if available
-            const eventId = event.ID;
-            if (imageData[eventId] && imageData[eventId].length > 0) {
-                imageData[eventId].forEach(img => {
-                    const imgElement = document.createElement('img');
-                    imgElement.className = 'gallery-image';
-                    imgElement.src = img.data;
-                    imgElement.alt = img.name;
-                    
-                    imgElement.addEventListener('click', () => {
-                        showFullscreenImage(img.data);
-                    });
-                    
-                    imageGallery.appendChild(imgElement);
-                });
+            if (url.match(/youtube\.com|youtu\.be/)) {
+                const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)[1];
+                videoWrapper.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            } else if (url.match(/vimeo\.com/)) {
+                const videoId = url.match(/(\d+)/)[0];
+                videoWrapper.innerHTML = `
+                    <iframe 
+                        src="https://player.vimeo.com/video/${videoId}" 
+                        frameborder="0" 
+                        allow="autoplay; fullscreen" 
+                        allowfullscreen>
+                    </iframe>
+                `;
             } else {
-                imageGallery.innerHTML = '<p>No images available.</p>';
+                videoWrapper.innerHTML = `
+                    <video controls>
+                        <source src="${url}" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                `;
             }
             
-            // Show the modal
-            modal.style.display = 'block';
-        }
+            videoSection.appendChild(videoWrapper);
+        });
+        
+        imageGallery.after(videoSection);
+    }
+
+    modal.style.display = 'block';
+}
         
         // Function to show a fullscreen image
         function showFullscreenImage(src) {
