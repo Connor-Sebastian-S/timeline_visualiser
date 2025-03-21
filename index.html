@@ -1002,6 +1002,8 @@ function displayTimeline() {
         });
         
         imageGallery.after(audioSection);
+    } else {
+        audioSection.innerHTML = '<p>No audio available.</p>';
     }
 
     // Add video embeds
@@ -1048,6 +1050,8 @@ function displayTimeline() {
         });
         
         imageGallery.after(videoSection);
+    } else {
+        videoSection.innerHTML = '<p>No video available.</p>';
     }
 
     modal.style.display = 'block';
