@@ -1,32 +1,41 @@
 ID,START_DATE,END_DATE,NAME,DESCRIPTION,TYPE
-1,01-01-0830,01-01-0830,Pictish Stone Carvings,"Earliest dated carved stones created by Pictish inhabitants near Abernethy, depicting symbolic animals and Celtic crosses.",Cultural
-2,01-01-1114,01-01-1114,Founding of Scone Abbey,"The Augustinian Scone Abbey is established, later becoming the coronation site of Scottish kings.",Religious
-3,12-06-1160,12-06-1160,Perth Royal Charter,"King Malcolm IV grants Perth its first royal charter, establishing it as a burgh with trading privileges.",Political
-4,01-01-1237,01-01-1237,Blackfriars Monastery,"Dominican friars establish Perth's Blackfriars Monastery, becoming a center of medieval learning.",Religious
-5,10-09-1396,10-09-1396,Battle of the North Inch,"Clan combat before King Robert III: 30vs30 judicial duel between Clan Chattan and Clan Kay in Perth.",Military
-6,01-05-1437,01-05-1437,Assassination of James I,"King James I murdered in Perth's Blackfriars Monastery by disgruntled nobles led by Sir Robert Graham.",Political
-7,15-03-1559,15-05-1559,Reformation Riots,"Protestant reformers led by John Knox destroy Scone Abbey and Perth's monastic buildings.",Religious
-8,01-01-1600,01-01-1600,Perth's Final Charter,"King James VI grants Perth its final royal charter confirming special trading rights with the Low Countries.",Political
-9,01-09-1715,10-11-1715,Jacobite Occupation,"Jacobite forces under Earl of Mar make Perth their headquarters during 1715 uprising.",Military
-10,01-01-1745,01-02-1746,1745 Jacobite Campaign,"Bonnie Prince Charlie's army occupies Perth twice during the '45 rebellion, recruiting local clans.",Military
-11,01-01-1760,01-01-1760,Linen Trade Boom,"Perth becomes Scotland's main linen production center with 1,800 handlooms operating.",Economic
-12,12-07-1771,12-07-1771,Tay Bridge Disaster,"Original Perth Bridge over River Tay collapses during construction, killing 12 workers.",Infrastructure
-13,01-01-1807,01-01-1807,Perth Museum Founded,"One of Scotland's oldest museums established by the Perth Literary & Antiquarian Society.",Cultural
-14,22-05-1848,22-05-1848,Perth Railway Opening,"Scottish Central Railway connects Perth to Edinburgh and Glasgow.",Infrastructure
-15,01-01-1852,01-01-1852,Black Watch Homecoming,"Perth welcomes back the 42nd Regiment (Black Watch) from Crimean War with grand parade.",Military
-16,01-06-1865,01-06-1865,Perth Gas Works,"First gas lighting system installed in Perth streets.",Infrastructure
-17,01-01-1881,01-01-1881,Tay Salmon Fisheries,"Record catch of 3,000 salmon in one day at Perth's historic fishing stations.",Economic
-18,01-01-1901,01-01-1901,Perth City Hall,"Grand Edwardian city hall opens with distinctive clock tower.",Infrastructure
-19,01-01-1930,01-01-1935,Tummel Hydro Scheme,"Construction of Loch Tummel dam brings hydroelectric power to Highland Perthshire.",Infrastructure
-20,10-05-1935,10-05-1935,Perth Airport Opens,"Scotland's first municipal airport operational at Scone.",Infrastructure
-21,01-09-1939,01-09-1945,WWII Preparations,"Perth becomes hub for military training with camps at Scone Palace grounds.",Military
-22,01-01-1947,01-01-1947,Perth Festival Launch,"First Perth Festival of the Arts establishing annual cultural event.",Cultural
-23,16-05-1975,16-05-1975,Local Government Reform,"Perthshire merges with Kinross-shire to form Perth and Kinross district.",Political
-24,01-06-1988,01-06-1988,Perth High Street Fire,"Devastating fire destroys historic buildings; reconstruction preserves medieval street plan.",Disaster
-25,01-01-1995,01-01-1995,Forestry Expansion,"Tay Forest Park established - largest man-made forest in UK.",Environmental
-26,14-03-2012,14-03-2012,City Status Regained,"Perth regains city status for Queen's Diamond Jubilee.",Political
-27,01-01-2017,01-01-2017,V&A Dundee Impact,"Though in Dundee, the design museum's opening boosts tourism across Perthshire.",Economic
-28,01-01-2020,31-12-2023,Perthshire 800,"Celebrations for 800th anniversary of 1220 royal charter.",Cultural
-29,15-09-2021,15-09-2021,UNESCO Folk Festival,"Perth hosts first UNESCO-recognized Scottish folk music festival.",Cultural
-30,01-01-2023,01-01-2023,Rewilding Project,"20,000-acre Highland estate begins major rewilding initiative with lynx reintroduction.",Environmental
-31,01-01-2025,01-01-2025,Stone of Destiny Return,"Historic coronation stone permanently returns to Perth Museum from London.",Cultural
+1,01-01-0500,01-01-0500,Arrival of the Scots,"The Scots, a Gaelic people, begin to settle in what is now Scotland.",Cultural
+2,01-01-0840,01-01-0840,Battle of Brunanburh,"A significant battle where the Scots, led by Kenneth MacAlpin, defeat the English.",Military
+3,01-01-0900,01-01-0900,Formation of the Kingdom of Alba,"The unification of various tribes under the rule of Kenneth MacAlpin.",Political
+4,01-01-1000,01-01-1000,St. Columba's Mission,"St. Columba establishes a monastic community on Iona, spreading Christianity.",Religious
+5,01-01-1050,01-01-1050,Macbeth's Reign,"Macbeth becomes King of Scotland, known for his controversial rule.",Political
+6,01-01-1066,01-01-1066,Battle of Stamford Bridge,"A battle marking the end of Viking invasions in England, impacting Scotland.",Military
+7,01-01-1070,01-01-1070,Norman Influence,"The arrival of Normans in Scotland leads to changes in land ownership and culture.",Cultural
+8,01-01-1100,01-01-1100,David I's Reign,"David I promotes feudalism and the establishment of monasteries in Scotland.",Political
+9,01-01-1130,01-01-1130,Foundation of the Abbey of Dunfermline,"David I founds the Abbey, a significant religious site in Scotland.",Religious
+10,01-01-1150,01-01-1150,The Treaty of Perth,"Agreement between Scotland and Norway, securing the Hebrides for Scotland.",Political
+11,01-01-1214,01-01-1214,Battle of the Standard,"A significant battle where Scottish forces resist English invasion.",Military
+12,01-01-1286,01-01-1286,Death of Alexander III,"The death of Alexander III leads to a succession crisis in Scotland.",Political
+13,01-01-1290,01-01-1290,The Treaty of Birgham,"An agreement to marry Margaret, Maid of Norway, to Edward I's son.",Political
+14,01-01-1296,01-01-1296,First War of Scottish Independence,"Edward I invades Scotland, leading to the struggle for independence.",Military
+15,01-01-1297,01-01-1297,Battle of Stirling Bridge,"William Wallace leads a significant victory against the English.",Military
+16,01-01-1305,01-01-1305,Execution of William Wallace,"Wallace is captured and executed, becoming a martyr for Scottish independence.",Political
+17,01-01-1306,01-01-1306,Robert the Bruce's Ascendancy,"Robert the Bruce is crowned King of Scots, leading the fight for independence.",Political
+18,01-01-1314,01-01-1314,Battle of Bannockburn,"A decisive Scottish victory against the English, solidifying Bruce's reign.",Military
+19,01-01-1320,01-01-1320,Declaration of Arbroath,"A letter asserting Scotland's independence, sent to the Pope.",Political
+20,01-01-1332,01-01-1332,Battle of Dupplin Moor,"A battle where the English defeat the Scots, leading to further conflict.",Military
+21,01-01-1346,01-01-1346,Battle of Neville's Cross,"Scottish forces are defeated, and King David II is captured.",Military
+22,01-01-1357,01-01-1357,David II's Ransom,"David II is released after a lengthy captivity, returning to Scotland.",Political
+23,01-01-1371,01-01-1371,Robert II's Ascendancy,"Robert II becomes the first Stewart king of Scotland, marking a new dynasty.",Political
+24,01-01-1400,01-01-1400,Battle of Homildon Hill,"A significant battle where the English defeat the Scots, leading to political changes.",Military
+25,01-01-1424,01-01-1424,James I's Return,"James I returns to Scotland after being held captive in England, initiating reforms.",Political
+26,01-01-1437,01-01-1437,Assassination of James I,"James I is murdered, leading to instability in the Scottish crown.",Political
+27,01-01-1455,01-01-1455,Battle of Sauchieburn,"A battle resulting in the death of James II, leading to a power struggle.",Military
+28,01-01-1460,01-01-1460,Death of James III,"James III is killed at the Battle of Sauchieburn, leading to the rise of his son.",Political
+29,01-01-1488,01-01-1488,Battle of Sauchieburn,"James IV becomes king after the death of his father, James III.",Military
+30,01-01-1496,01-01-1496,Act of Uniformity,"Legislation aimed at standardizing religious practices in Scotland.",Religious
+31,01-01-1500,01-01-1500,Scottish Renaissance,"A cultural revival in Scotland, marked by advancements in art and literature.",Cultural
+32,01-01-1513,01-01-1513,Battle of Flodden,"A disastrous battle for Scotland against England, resulting in the death of James IV.",Military
+33,01-01-1542,01-01-1542,Death of James V,"James V dies, leaving a young daughter, Mary, Queen of Scots, as heir.",Political
+34,01-01-1560,01-01-1560,Scottish Reformation,"The Protestant Reformation leads to significant religious changes in Scotland.",Religious
+35,01-01-1567,01-01-1567,Abdication of Mary, Queen of Scots,"Mary abdicates in favor of her son, James VI, amid political turmoil.",Political
+36,01-01-1587,01-01-1587,Execution of Mary, Queen of Scots,"Mary is executed in England, leading to further conflict between Scotland and England.",Political
+37,01-01-1603,01-01-1603,Union of the Crowns,"James VI of Scotland becomes James I of England, uniting the crowns.",Political
+38,01-01-1625,01-01-1625,Charles I's Reign,"Charles I's reign leads to tensions between Scotland and England, culminating in civil war.",Political
+39,01-01-1640,01-01-1640,First Bishops' War,"Conflict between Scotland and Charles I over religious practices and governance.",Military
+40,01-01-1707,01-01-1707,Acts of Union,"The Acts of Union unite the Kingdom of Scotland and the Kingdom of England into Great Britain.",Political
