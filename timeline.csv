@@ -33,8 +33,8 @@ ID,START_DATE,END_DATE,NAME,DESCRIPTION,TYPE
 32,01-01-1513,01-01-1513,Battle of Flodden,"A disastrous battle for Scotland against England, resulting in the death of James IV.",Military
 33,01-01-1542,01-01-1542,Death of James V,"James V dies, leaving a young daughter, Mary, Queen of Scots, as heir.",Political
 34,01-01-1560,01-01-1560,Scottish Reformation,"The Protestant Reformation leads to significant religious changes in Scotland.",Religious
-35,01-01-1567,01-01-1567,Abdication of Mary, Queen of Scots,"Mary abdicates in favor of her son, James VI, amid political turmoil.",Political
-36,01-01-1587,01-01-1587,Execution of Mary, Queen of Scots,"Mary is executed in England, leading to further conflict between Scotland and England.",Political
+35,01-01-1567,01-01-1567,"Abdication of Mary, Queen of Scots","Mary abdicates in favor of her son, James VI, amid political turmoil.",Political
+36,01-01-1587,01-01-1587,"Execution of Mary, Queen of Scots","Mary is executed in England, leading to further conflict between Scotland and England.",Political
 37,01-01-1603,01-01-1603,Union of the Crowns,"James VI of Scotland becomes James I of England, uniting the crowns.",Political
 38,01-01-1625,01-01-1625,Charles I's Reign,"Charles I's reign leads to tensions between Scotland and England, culminating in civil war.",Political
 39,01-01-1640,01-01-1640,First Bishops' War,"Conflict between Scotland and Charles I over religious practices and governance.",Military
