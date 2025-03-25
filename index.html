@@ -504,18 +504,45 @@
         </div>
 
         <div class="file-requirements">
-        <!-- CSV Section -->
-        <div class="csv-section" style="margin-bottom: 2rem;">
-            <h3 style="color: #4a6fa5; margin-bottom: 1rem;">
-                <i class="fas fa-file-csv" style="margin-right: 0.5rem;"></i>
-                Description File Requirements
-            </h3>
-            <p>
-                .txt format file (text file)
-                Row 1 of your text file is the title of the timeline
-                Row 2 and the remaining rows of your text file is the description you want to show below the title. 
-            </p>
+    <div class="desc-section" style="margin-bottom: 2rem;">
+        <h3 style="color: #4a6fa5; margin-bottom: 1rem;">
+            <i class="fas fa-file-text" style="margin-right: 0.5rem;"></i>
+            Description File Requirements
+        </h3>
+        <div class="table-responsive" style="background: white; border-radius: 8px; padding: 1rem;">
+            <table class="table table-sm" style="margin-bottom: 0;">
+                <thead style="background: #e9ecef;">
+                    <tr>
+                        <th>Row</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                        <th>Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1st Row</td>
+                        <td>Timeline Title</td>
+                        <td>Medieval Scottish History</td>
+                        <td><span class="badge bg-danger">Required</span></td>
+                    </tr>
+                    <tr>
+                        <td>Subsequent Rows</td>
+                        <td>Timeline Description</td>
+                        <td>A journey through key events...</td>
+                        <td><span class="badge bg-success">Optional</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+        <div class="mt-3" style="margin-top: 1rem;">
+            <strong>File Format:</strong>
+            <pre style="background: white; padding: 1rem; border-radius: 6px;">Medieval Scottish History
+A comprehensive timeline exploring significant events in Scottish history during the medieval period. 
+This collection highlights political, military, and cultural milestones that shaped the nation.</pre>
+        </div>
+    </div>
+</div>
 
         <!-- ZIP Section -->
         <div class="zip-section" style="margin-bottom: 2rem;">
