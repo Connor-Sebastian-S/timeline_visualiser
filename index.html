@@ -245,6 +245,27 @@
             display: none;
         }
 
+        #timeline-description-container {
+                background-color: white;
+                padding: 15px;
+                border-radius: var(--border-radius);
+                box-shadow: var(--box-shadow);
+                margin-bottom: 20px;
+                display: none; /* Hidden by default */
+            }
+
+            #timeline-title {
+                font-size: 1.5rem;
+                color: var(--primary-color);
+                margin-bottom: 10px;
+                font-weight: bold;
+            }
+
+            #timeline-description {
+                color: #666;
+                line-height: 1.6;
+            }
+
         .event-box {
             position: absolute;
             width: 150px;
@@ -541,12 +562,24 @@ https://vimeo.com/example2</pre>
                 <label for="zip-file">ZIP File (optional):</label>
                 <input type="file" id="zip-file" accept=".zip">
             </div>
+
+            <div class="file-input">
+                    <label for="desc-file">Description File (optional):</label>
+                    <input type="file" id="desc-file" accept=".txt">
+                </div>
         </div>
         <button id="load-button">Load Timeline</button>
         <button id="load-default-button">Load Default Data</button>
         <div id="error-container"></div>
     </div>
 
+    <div id="timeline-description-container">
+            <div id="timeline-title"></div>
+            <div id="timeline-description"></div>
+        </div>
+
+
+    
     <div class="controls">
         <div class="toggle-container">
             <span>Colour by Type:</span>
@@ -561,6 +594,8 @@ https://vimeo.com/example2</pre>
         </div>
 
     </div>
+
+    
 
     <div id="timeline-container">
         <div id="loading" class="loading">Loading timeline...</div>
@@ -606,6 +641,11 @@ https://vimeo.com/example2</pre>
         const imageGallery = document.getElementById('image-gallery');
         const fullscreenContainer = document.getElementById('fullscreen-image-container');
         const fullscreenImg = document.getElementById('fullscreen-img');
+
+        const descFileInput = document.getElementById('desc-file');
+            const timelineDescriptionContainer = document.getElementById('timeline-description-container');
+            const timelineTitle = document.getElementById('timeline-title');
+            const timelineDescription = document.getElementById('timeline-description');
         
         // Hide loading initially
         loading.style.display = 'none';
@@ -1130,6 +1170,7 @@ function displayTimeline() {
         loadButton.addEventListener('click', async () => {
             const csvFile = csvFileInput.files[0];
             const zipFile = zipFileInput.files[0];
+            const descFile = descFileInput.files[0];
             
             clearError();
             
@@ -1156,6 +1197,15 @@ function displayTimeline() {
                 } else {
                     imageData = {};
                 }
+
+                // Process description file if provided
+                    if (descFile) {
+                        const descText = await descFile.text();
+                        processDescriptionFile(descText);
+                    } else {
+                        // Hide description container if no file
+                        timelineDescriptionContainer.style.display = 'none';
+                    }
                 
                 // Display the timeline
                 displayTimeline();
@@ -1207,6 +1257,21 @@ loadDefaultButton.addEventListener('click', async () => {
             console.error('Error loading default ZIP:', zipError);
             showError('Error loading default images. Timeline will display without images.');
         }
+
+        // Load default description file
+        try {
+            const descResponse = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/timeline_visualiser/main/desc.txt');
+            if (descResponse.ok) {
+                const descText = await descResponse.text();
+                processDescriptionFile(descText);
+            } else {
+                // Hide description container if file not found
+                timelineDescriptionContainer.style.display = 'none';
+            }
+        } catch (descError) {
+            console.error('Error loading default description:', descError);
+            timelineDescriptionContainer.style.display = 'none';
+        }
         
         // Display the timeline even if only one of the files loaded successfully
         if (eventData.length > 0) {
@@ -1255,6 +1320,27 @@ loadDefaultButton.addEventListener('click', async () => {
                 console.warn('JSZip preload failed, will try again when needed:', error);
             });
         });
+
+        function processDescriptionFile(descText) {
+                // Split the description text into lines
+                const lines = descText.split('\n');
+                
+                // First line is the title, remaining lines are the description
+                if (lines.length > 0) {
+                    const title = lines[0].trim();
+                    const description = lines.slice(1).join('\n').trim();
+                    
+                    // Set the title and description
+                    timelineTitle.textContent = title;
+                    timelineDescription.textContent = description;
+                    
+                    // Show the description container
+                    timelineDescriptionContainer.style.display = 'block';
+                } else {
+                    // Hide if no content
+                    timelineDescriptionContainer.style.display = 'none';
+                }
+            }
     </script>
 </body>
 </html>
